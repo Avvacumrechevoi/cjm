@@ -1326,12 +1326,211 @@ const CJM_STAGES = [
 const EMOTION_COLORS = ["#dc2626","#ea580c","#f59e0b","#84cc16","#22c55e"];
 const EMOTION_LABELS = ["Гнев","Фрустрация","Нейтрально","Доволен","Восторг"];
 
+const CJM_SCREENSHOTS = {
+  1: [
+    { id:"s1-app", file:"img/stage3-top.jpg", area:"bottom",
+      label:"Баннер «СКАЧАТЬ» приложение",
+      desc:"Внизу экрана баннер загрузки приложения. При 85.7% мобильного трафика — отсутствие в App Store / Google Play критично.",
+      problems:[
+        {x:50,y:92,text:"Приложения нет в сторах — только APK. Конкуренты Betano, Sportingbet в App Store."}
+      ]},
+    { id:"s1-tg", file:"img/stage3-footer.jpg", area:"social",
+      label:"Telegram — 238 подписчиков",
+      desc:"В футере ссылка на Telegram, Instagram, X. Telegram-канал есть но фактически мёртв (238 подписчиков).",
+      problems:[
+        {x:18,y:72,text:"Telegram канал: 238 подписчиков за весь период при 677K пользователей — упущенный бесплатный retention-канал."}
+      ]},
+  ],
+  2: [
+    { id:"s2-footer", file:"img/stage3-footer.jpg", area:"trust",
+      label:"Футер: trust-элементы",
+      desc:"МЕДИА ПАРТНЁРЫ (Casino Guru, casinoMentor), GamCare, Copyright. Единственные элементы социального доказательства на сайте.",
+      problems:[
+        {x:50,y:38,text:"Медиа-партнёры есть, но нет ленты выигрышей и отзывов игроков — ключевого social proof для LATAM."},
+        {x:50,y:85,text:"GamCare и лицензия — хорошо для доверия, но пользователь видит это только в самом низу страницы."}
+      ]},
+  ],
+  3: [
+    { id:"s3-hero", file:"img/stage3-top.jpg", area:"promo",
+      label:"Промо-сторис и навигация",
+      desc:"Первый экран: 4 промо-сториса, навигация Спорт/Казино/Live-Казино, ТОП СПОРТЫ, начало СЛОТОВ.",
+      problems:[
+        {x:35,y:18,text:"2 из 4 промо — спортивные акции ('Двойной вызов: футбол', '30% кэшбэк теннис') при Casino = 92% GGR."},
+        {x:50,y:46,text:"ТОП СПОРТЫ: Футбол, Баскетбол, Теннис, Настольный теннис — нет UFC/MMA для BR и MX аудитории."}
+      ]},
+    { id:"s3-content", file:"img/stage3-mid.jpg", area:"content",
+      label:"Контент: события, live-казино, игры",
+      desc:"Прокрутка ниже: ТОП СОБЫТИЯ со ставками, LIVE-КАЗИНО, SB GAMES с категориями игр.",
+      problems:[
+        {x:50,y:55,text:"SB GAMES: категории 'Все игры', 'Для Вас', 'Лучшее' — сортировка не по марже. Fortune Tiger #1 при 1.15% маржи."}
+      ]},
+  ],
+  4: [],
+  5: [],
+  6: [
+    { id:"s6-slots", file:"img/stage3-top.jpg", area:"slots",
+      label:"Слоты: Fortune Tiger в топе",
+      desc:"СЛОТЫ секция: Fortune Tiger на первом месте — самая популярная игра (2 878 игроков) но маржа gross 1.15%.",
+      problems:[
+        {x:22,y:76,text:"Fortune Tiger #1: маржа 1.15% (почти ноль). Energy Coins (14.5%) и Joker's Jewels (17.5%) не в топе лобби."}
+      ]},
+    { id:"s6-categories", file:"img/stage3-mid.jpg", area:"games",
+      label:"Категории игр и провайдеры",
+      desc:"SB GAMES: Все игры, Для Вас, Лучшее, Лотереи, Слоты. Поиск не на первом экране мобильного лобби.",
+      problems:[
+        {x:50,y:40,text:"Строка поиска не видна на первом экране. Через /casino/search — 643 сек сессия (лучший engagement)."},
+        {x:50,y:90,text:"50+ убыточных провайдеров (Barbara Bang –$5.7K, Hacksaw –$4.3K) остаются доступны в лобби."}
+      ]},
+  ],
+  7: [],
+  8: [],
+  9: [
+    { id:"s9-social", file:"img/stage3-footer.jpg", area:"social",
+      label:"Соцсети в футере",
+      desc:"Telegram, Instagram, X — единственные каналы возврата. Telegram: 238 подписчиков. Нет email-рассылки, нет push.",
+      problems:[
+        {x:18,y:72,text:"Нет CRM-онбординга: после FTD — тишина. Нет email T+2ч, T+24ч, T+48ч."},
+        {x:50,y:72,text:"Instagram и X без стратегии контента. Нет ленты выигрышей, нет промокодов для подписчиков."}
+      ]},
+  ],
+  10: [],
+};
+
+function ScreenshotCard({ shot, isMobile, onOpen }) {
+  const hasFile = false;
+  const areaColors = {
+    promo:"#e5a940", content:"#2563eb", trust:"#22c55e", slots:"#7c3aed",
+    games:"#06b6d4", social:"#f59e0b", bottom:"#ef4444",
+  };
+  const ac = areaColors[shot.area] || BRAND.blue;
+  return (
+    <div style={{
+      background:BRAND.card, border:`1px solid ${BRAND.border}`, borderRadius:10,
+      overflow:"hidden", cursor:"pointer", transition:"all 0.2s",
+    }} onClick={() => onOpen(shot)}>
+      <div style={{
+        height: isMobile?140:180, background:`linear-gradient(135deg, ${ac}15, ${BRAND.bg})`,
+        display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
+        position:"relative", overflow:"hidden",
+        borderBottom:`2px solid ${ac}44`,
+      }}>
+        {shot.file && <img src={shot.file} alt={shot.label} style={{
+          position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", opacity:0.85,
+        }} onError={(e)=>{e.target.style.display="none"}}/>}
+        <div style={{
+          position:"relative", zIndex:1, textAlign:"center", padding:"0 12px",
+          textShadow: "0 1px 8px rgba(0,0,0,0.8)",
+        }}>
+          <div style={{ fontSize:28, marginBottom:4 }}>📱</div>
+          <div style={{ fontSize:10, color:BRAND.textSecondary, fontWeight:600 }}>{shot.label}</div>
+        </div>
+        {shot.problems.map((p,i) => (
+          <div key={i} style={{
+            position:"absolute", left:`${p.x}%`, top:`${p.y}%`, transform:"translate(-50%,-50%)",
+            width:20, height:20, borderRadius:"50%", background:"#ef4444", border:"2px solid #fff",
+            display:"flex", alignItems:"center", justifyContent:"center",
+            fontSize:10, fontWeight:800, color:"#fff", zIndex:2,
+            boxShadow:"0 0 8px #ef444488", cursor:"pointer",
+          }}>{i+1}</div>
+        ))}
+      </div>
+      <div style={{ padding:"10px 12px" }}>
+        <div style={{ fontSize:11, fontWeight:700, color:BRAND.textPrimary, marginBottom:4 }}>{shot.label}</div>
+        <div style={{ fontSize:10, color:BRAND.textSecondary, lineHeight:1.5, marginBottom:6 }}>{shot.desc}</div>
+        {shot.problems.map((p,i) => (
+          <div key={i} style={{
+            display:"flex", gap:6, alignItems:"flex-start", marginBottom:4,
+            padding:"5px 8px", background:"#1a0808", borderRadius:6, border:"1px solid #7f1d1d33",
+          }}>
+            <div style={{
+              width:16, height:16, borderRadius:"50%", background:"#ef4444", flexShrink:0,
+              display:"flex", alignItems:"center", justifyContent:"center",
+              fontSize:8, fontWeight:800, color:"#fff",
+            }}>{i+1}</div>
+            <div style={{ fontSize:10, color:"#fca5a5", lineHeight:1.4 }}>{p.text}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function ScreenshotModal({ shot, onClose }) {
+  if (!shot) return null;
+  return (
+    <div onClick={onClose} style={{
+      position:"fixed", inset:0, zIndex:9999,
+      background:"rgba(0,0,0,0.88)", display:"flex", alignItems:"center", justifyContent:"center",
+      padding:20, cursor:"pointer",
+    }}>
+      <div onClick={e=>e.stopPropagation()} style={{
+        maxWidth:600, width:"100%", maxHeight:"90vh", overflowY:"auto",
+        background:BRAND.card, borderRadius:14, border:`1px solid ${BRAND.borderLt}`,
+        cursor:"default",
+      }}>
+        <div style={{
+          height:300, background:`linear-gradient(135deg, ${BRAND.blue}10, ${BRAND.bg})`,
+          position:"relative", overflow:"hidden", borderRadius:"14px 14px 0 0",
+        }}>
+          {shot.file && <img src={shot.file} alt={shot.label} style={{
+            position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"contain",
+            background:BRAND.bg,
+          }} onError={(e)=>{e.target.style.display="none"}}/>}
+          <div style={{
+            position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center",
+          }}>
+            <div style={{ textAlign:"center", textShadow:"0 2px 12px rgba(0,0,0,0.9)" }}>
+              <div style={{ fontSize:40 }}>📱</div>
+              <div style={{ fontSize:12, color:BRAND.textSecondary, fontWeight:700, marginTop:4 }}>{shot.label}</div>
+            </div>
+          </div>
+          {shot.problems.map((p,i) => (
+            <div key={i} style={{
+              position:"absolute", left:`${p.x}%`, top:`${p.y}%`, transform:"translate(-50%,-50%)",
+              width:26, height:26, borderRadius:"50%", background:"#ef4444", border:"2px solid #fff",
+              display:"flex", alignItems:"center", justifyContent:"center",
+              fontSize:12, fontWeight:800, color:"#fff", zIndex:2,
+              boxShadow:"0 0 12px #ef444488",
+            }}>{i+1}</div>
+          ))}
+          <button onClick={onClose} style={{
+            position:"absolute", top:10, right:10, width:32, height:32, borderRadius:"50%",
+            background:"rgba(0,0,0,0.6)", border:"1px solid #ffffff33", color:"#fff",
+            fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+          }}>✕</button>
+        </div>
+        <div style={{ padding:"16px 18px" }}>
+          <div style={{ fontSize:14, fontWeight:800, color:BRAND.textPrimary, marginBottom:6 }}>{shot.label}</div>
+          <div style={{ fontSize:11, color:BRAND.textSecondary, lineHeight:1.6, marginBottom:12 }}>{shot.desc}</div>
+          <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
+            Проблемы на UI
+          </div>
+          {shot.problems.map((p,i) => (
+            <div key={i} style={{
+              display:"flex", gap:8, alignItems:"flex-start", marginBottom:8,
+              padding:"8px 12px", background:"#1a0808", borderRadius:8, border:"1px solid #7f1d1d44",
+            }}>
+              <div style={{
+                width:22, height:22, borderRadius:"50%", background:"#ef4444", flexShrink:0,
+                display:"flex", alignItems:"center", justifyContent:"center",
+                fontSize:10, fontWeight:800, color:"#fff",
+              }}>{i+1}</div>
+              <div style={{ fontSize:11, color:"#fca5a5", lineHeight:1.5, fontWeight:500 }}>{p.text}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── CJM FUNNEL VIEW ──────────────────────────────────────────
 function CJMFunnelView({ month, geo, product, isMobile }) {
   const [activeStage, setActiveStage] = useState(1);
   const [innerTab, setInnerTab] = useState("steps");
   const [expandedStep, setExpandedStep] = useState(null);
   const [expandedBarrier, setExpandedBarrier] = useState(null);
+  const [modalShot, setModalShot] = useState(null);
   const [expandedAction, setExpandedAction] = useState(null);
 
   const isAllMonth = month === "ALL";
@@ -1527,6 +1726,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
 
   const innerTabs = [
     {id:"steps",    icon:"👣", label:"Шаги"},
+    {id:"ui",       icon:"📱", label:"UI"},
     {id:"barriers", icon:"🚧", label:"Барьеры"},
     {id:"actions",  icon:"⚡", label:"Действия"},
     {id:"metrics",  icon:"📊", label:"Метрики"},
@@ -1867,6 +2067,35 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                 <div style={{ fontSize:8.5, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>Контекст сессии</div>
                 <div style={{ fontSize:10.5, color:"#7a9ab8", lineHeight:1.6 }}>{stage?.context}</div>
               </div>
+            </div>
+          )}
+
+          {innerTab === "ui" && (
+            <div>
+              <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:10 }}>
+                📱 Скриншоты интерфейса · Нажми — детали и проблемы UI
+              </div>
+              {(CJM_SCREENSHOTS[activeStage] || []).length > 0 ? (
+                <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12 }}>
+                  {(CJM_SCREENSHOTS[activeStage] || []).map(shot => (
+                    <ScreenshotCard key={shot.id} shot={shot} isMobile={isMobile} onOpen={setModalShot}/>
+                  ))}
+                </div>
+              ) : (
+                <div style={{
+                  padding:"40px 20px", textAlign:"center", background:BRAND.card,
+                  borderRadius:10, border:`1px dashed ${BRAND.border}`,
+                }}>
+                  <div style={{ fontSize:32, marginBottom:8 }}>📷</div>
+                  <div style={{ fontSize:12, color:BRAND.textTertiary, fontWeight:600, marginBottom:4 }}>
+                    Скриншоты для этого этапа пока не добавлены
+                  </div>
+                  <div style={{ fontSize:10, color:BRAND.textMuted }}>
+                    Добавьте скриншоты в папку img/ и обновите CJM_SCREENSHOTS
+                  </div>
+                </div>
+              )}
+              {modalShot && <ScreenshotModal shot={modalShot} onClose={()=>setModalShot(null)}/>}
             </div>
           )}
 
