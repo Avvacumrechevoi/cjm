@@ -1,6 +1,32 @@
 const { useState, useMemo, useEffect, useCallback } = React;
 const { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Legend, AreaChart, Area } = Recharts;
 
+const BRAND = {
+  bg:        "#070b14",
+  surface:   "#0c1222",
+  card:      "#0f172a",
+  cardAlt:   "#111a2e",
+  border:    "#1c2b45",
+  borderLt:  "#243552",
+  blue:      "#2563eb",
+  blueLight: "#3b82f6",
+  blueDark:  "#1d4ed8",
+  gold:      "#e5a940",
+  goldLight: "#f0c05e",
+  goldDark:  "#c99230",
+  purple:    "#7c3aed",
+  purpleLight:"#a78bfa",
+  green:     "#22c55e",
+  red:       "#ef4444",
+  redDark:   "#dc2626",
+  amber:     "#f59e0b",
+  cyan:      "#06b6d4",
+  textPrimary: "#f1f5f9",
+  textSecondary: "#c1cfe0",
+  textTertiary: "#8ea4bd",
+  textMuted: "#6580a0",
+};
+
 function useIsMobile(breakpoint = 768) {
   const [w, setW] = useState(window.innerWidth);
   useEffect(() => {
@@ -138,27 +164,27 @@ const PRODUCT_SHARE = { casino: 0.92, sport: 0.08, all: 1.0 };
 // COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 
-const Pill = ({label, active, color="#1a56db", onClick, size="sm"}) => (
+const Pill = ({label, active, color=BRAND.blue, onClick, size="sm"}) => (
   <button onClick={onClick} style={{
     padding: size === "lg" ? "7px 16px" : "4px 11px",
-    borderRadius: 20, border: `1.5px solid ${active ? color : "#2d3748"}`,
-    background: active ? `${color}22` : "transparent",
-    color: active ? "#fff" : "#64748b",
-    fontSize: size === "lg" ? 12 : 10.5, fontWeight: active ? 700 : 400,
+    borderRadius: 20, border: `1.5px solid ${active ? color : BRAND.border}`,
+    background: active ? `${color}25` : "transparent",
+    color: active ? "#fff" : BRAND.textTertiary,
+    fontSize: size === "lg" ? 12 : 10.5, fontWeight: active ? 700 : 500,
     cursor: "pointer", transition: "all 0.18s", whiteSpace: "nowrap"
   }}>{label}</button>
 );
 
 const StatCard = ({label, value, sub, color, trend, small}) => (
   <div style={{
-    background: "#111827", border: `1px solid ${color}33`,
+    background: "#0f172a", border: `1px solid ${color}33`,
     borderRadius: 10, padding: small ? "10px 12px" : "14px 16px",
     borderLeft: `3px solid ${color}`, flex: 1, minWidth: 0
   }}>
-    <div style={{ fontSize: small ? 9 : 10, color: "#64748b", marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</div>
+    <div style={{ fontSize: small ? 9 : 10, color: BRAND.textTertiary, marginBottom: 3, textTransform: "uppercase", letterSpacing: "0.5px" }}>{label}</div>
     <div style={{ fontSize: small ? 18 : 22, fontWeight: 800, color, lineHeight:1 }}>{value}</div>
-    {sub && <div style={{ fontSize: 9.5, color: "#94a3b8", marginTop: 4 }}>{sub}</div>}
-    {trend && <div style={{ fontSize: 10, color: trend.up ? "#22c55e" : "#ef4444", marginTop: 3, fontWeight: 600 }}>
+    {sub && <div style={{ fontSize: 9.5, color: BRAND.textSecondary, marginTop: 4 }}>{sub}</div>}
+    {trend && <div style={{ fontSize: 10, color: trend.up ? BRAND.green : BRAND.red, marginTop: 3, fontWeight: 600 }}>
       {trend.up ? "▲" : "▼"} {Math.abs(trend.val)}%
     </div>}
   </div>
@@ -167,8 +193,8 @@ const StatCard = ({label, value, sub, color, trend, small}) => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   return (
-    <div style={{ background: "#1e2535", border: "1px solid #2d3748", borderRadius: 8, padding: "10px 14px" }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 6 }}>{label}</div>
+    <div style={{ background: BRAND.cardAlt, border: `1px solid ${BRAND.borderLt}`, borderRadius: 8, padding: "10px 14px" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: BRAND.textSecondary, marginBottom: 6 }}>{label}</div>
       {payload.map((p, i) => (
         <div key={i} style={{ fontSize: 11, color: p.color, marginBottom: 2 }}>
           {p.name}: <strong>{typeof p.value === 'number' && p.value > 1000 ? fmtN(p.value) : p.value}</strong>
@@ -238,7 +264,7 @@ function OverviewView({ month, geo, product, isMobile }) {
     <div style={{ padding: isMobile?"12px":"16px 20px", overflowY: "auto", height: "100%", WebkitOverflowScrolling:"touch" }}>
       {/* KPI row */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr", gap: isMobile?8:10, marginBottom: 16 }}>
-        <StatCard label="Депозиты (OK)" value={fmt(totalDepSum)} sub={`${fmtN(totalDepPlayers)} игроков · avg $${Math.round(avgDep)}`} color="#1a56db" trend={trendDep} small={isMobile} />
+        <StatCard label="Депозиты (OK)" value={fmt(totalDepSum)} sub={`${fmtN(totalDepPlayers)} игроков · avg $${Math.round(avgDep)}`} color="#2563eb" trend={trendDep} small={isMobile} />
         <StatCard label="GGR / Прибыль" value={fmt(totalProfit)} sub={product === "all" ? "Casino 92% + Sport 8%" : product === "casino" ? "Casino only (92%)" : "Sport only (8%)"} color="#7c3aed" small={isMobile} />
         <StatCard label="Decline rate" value={`${avgDecline.toFixed(1)}%`} sub={geo === "MX" ? "⚠️ MX критично" : geo === "CO" ? "🔴 CO катастрофа" : "средний по периоду"} color={avgDecline > 35 ? "#dc2626" : avgDecline > 20 ? "#f59e0b" : "#22c55e"} small={isMobile} />
         <StatCard label="Вывод OK rate" value={`${wdOkPct.toFixed(1)}%`} sub={`${fmt(wdOkSum)} выплачено`} color="#0891b2" small={isMobile} />
@@ -247,39 +273,39 @@ function OverviewView({ month, geo, product, isMobile }) {
       {/* Charts row */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile?"1fr":"1fr 1fr", gap: 12, marginBottom: 14 }}>
         {/* Deposits trend */}
-        <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 10 }}>
+        <div style={{ background: "#0f172a", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#c1cfe0", marginBottom: 10 }}>
             💰 Депозиты по месяцам — {GEO_NAMES[geo]}
           </div>
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={chartDep}>
               <defs>
                 <linearGradient id="depGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#1a56db" stopOpacity={0.3}/>
-                  <stop offset="95%" stopColor="#1a56db" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-              <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}K`}/>
+              <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}K`}/>
               <Tooltip content={<CustomTooltip/>}/>
-              <Area type="monotone" dataKey="deposits" name="Депозиты $" stroke="#1a56db" strokeWidth={2} fill="url(#depGrad)"/>
+              <Area type="monotone" dataKey="deposits" name="Депозиты $" stroke="#2563eb" strokeWidth={2} fill="url(#depGrad)"/>
             </AreaChart>
           </ResponsiveContainer>
         </div>
 
         {/* Players + Decline */}
-        <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 10 }}>
+        <div style={{ background: "#0f172a", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#c1cfe0", marginBottom: 10 }}>
             👥 Игроки и % отказов — {GEO_NAMES[geo]}
           </div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartDep}>
-              <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-              <YAxis yAxisId="left" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false}/>
-              <YAxis yAxisId="right" orientation="right" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
+              <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+              <YAxis yAxisId="left" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false}/>
+              <YAxis yAxisId="right" orientation="right" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
               <Tooltip content={<CustomTooltip/>}/>
-              <Bar yAxisId="left" dataKey="players" name="Игроков" fill="#1a56db" radius={[3,3,0,0]}>
-                {chartDep.map((d, i) => <Cell key={i} fill={d.month === month ? "#1a56db" : "#1a56db66"}/>)}
+              <Bar yAxisId="left" dataKey="players" name="Игроков" fill="#2563eb" radius={[3,3,0,0]}>
+                {chartDep.map((d, i) => <Cell key={i} fill={d.month === month ? "#2563eb" : "#1a56db66"}/>)}
               </Bar>
               <Line yAxisId="right" type="monotone" dataKey="decline" name="Decline %" stroke="#ef4444" strokeWidth={2} dot={{fill:"#ef4444",r:3}}/>
             </BarChart>
@@ -287,8 +313,8 @@ function OverviewView({ month, geo, product, isMobile }) {
         </div>
 
         {/* DAU Trend */}
-        <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 10 }}>
+        <div style={{ background: "#0f172a", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#c1cfe0", marginBottom: 10 }}>
             📊 DAU и новые пользователи (GA4)
           </div>
           <ResponsiveContainer width="100%" height={160}>
@@ -303,8 +329,8 @@ function OverviewView({ month, geo, product, isMobile }) {
                   <stop offset="95%" stopColor="#0891b2" stopOpacity={0}/>
                 </linearGradient>
               </defs>
-              <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-              <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false}/>
+              <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false}/>
               <Tooltip content={<CustomTooltip/>}/>
               <Area type="monotone" dataKey="dau" name="DAU" stroke="#7c3aed" strokeWidth={2} fill="url(#dauGrad)"/>
               <Area type="monotone" dataKey="newUsers" name="New users/day" stroke="#0891b2" strokeWidth={1.5} fill="url(#newGrad)"/>
@@ -313,14 +339,14 @@ function OverviewView({ month, geo, product, isMobile }) {
         </div>
 
         {/* Withdrawal trend */}
-        <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 10 }}>
+        <div style={{ background: "#0f172a", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#c1cfe0", marginBottom: 10 }}>
             🏦 Выводы: одобрено vs отказано
           </div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={chartWd}>
-              <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-              <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
+              <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
               <Tooltip content={<CustomTooltip/>}/>
               <Bar dataKey="okSum" name="Одобрено $" fill="#22c55e" stackId="a" radius={[0,0,0,0]}/>
               <Bar dataKey="failSum" name="Отказано $" fill="#ef4444" stackId="a" radius={[3,3,0,0]}/>
@@ -330,8 +356,8 @@ function OverviewView({ month, geo, product, isMobile }) {
       </div>
 
       {/* Retention benchmarks */}
-      <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: isMobile?"12px":"14px 16px" }}>
-        <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 12 }}>
+      <div style={{ background: "#0f172a", border: "1px solid #1f2d40", borderRadius: 10, padding: isMobile?"12px":"14px 16px" }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: "#c1cfe0", marginBottom: 12 }}>
           🔄 Retention vs норма отрасли · 4 мес (4мес, платформа)
         </div>
         <div style={{ display: "flex", gap: isMobile?10:16 }}>
@@ -342,11 +368,11 @@ function OverviewView({ month, geo, product, isMobile }) {
             {label:"D30",actual:0.20,norm:6,color:"#f59e0b"},
           ].map(r => (
             <div key={r.label} style={{ flex:1, textAlign:"center" }}>
-              <div style={{ fontSize:10, color:"#64748b", marginBottom:6 }}>{r.label}</div>
+              <div style={{ fontSize:10, color:"#8ea4bd", marginBottom:6 }}>{r.label}</div>
               <div style={{ position:"relative", height:80, display:"flex", flexDirection:"column", justifyContent:"flex-end", gap:4 }}>
                 {/* Norm bar */}
                 <div style={{ position:"absolute", bottom:0, left:"30%", right:"30%", height:`${(r.norm/35)*100}%`, background:"#1f2d4088", borderRadius:3, border:"1px dashed #374151" }}>
-                  <div style={{ fontSize:8, color:"#64748b", textAlign:"center", marginTop:2 }}>норма {r.norm}%</div>
+                  <div style={{ fontSize:8, color:"#8ea4bd", textAlign:"center", marginTop:2 }}>норма {r.norm}%</div>
                 </div>
                 {/* Actual bar */}
                 <div style={{ position:"absolute", bottom:0, left:"35%", right:"35%", height:`${Math.max(4,(r.actual/35)*100)}%`, background:r.color, borderRadius:3, boxShadow:`0 0 8px ${r.color}60` }}>
@@ -406,32 +432,32 @@ function DepositsView({ month, geo, product, isMobile }) {
           const d = DEP[mo][geo];
           const prev = DEP[MONTHS[MONTHS.indexOf(mo)-1]]?.[geo];
           return d ? (
-            <div key={mo} style={{ flex:1, background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"12px 14px" }}>
+            <div key={mo} style={{ flex:1, background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"12px 14px" }}>
               <div style={{ fontSize:10, color:"#7c3aed", fontWeight:700, marginBottom:6 }}>{MONTH_LABELS[mo]}{months.length===1&&MONTHS.indexOf(mo)>0 ? " (vs "+(MONTHS[MONTHS.indexOf(mo)-1])+")" : ""}</div>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-                <span style={{ fontSize:9, color:"#64748b" }}>OK депозиты</span>
+                <span style={{ fontSize:9, color:"#8ea4bd" }}>OK депозиты</span>
                 <span style={{ fontSize:11, fontWeight:700, color:"#22c55e" }}>{fmtN(d.ok)}</span>
               </div>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-                <span style={{ fontSize:9, color:"#64748b" }}>Сумма OK</span>
-                <span style={{ fontSize:11, fontWeight:700, color:"#1a56db" }}>{fmt(d.sum)}</span>
+                <span style={{ fontSize:9, color:"#8ea4bd" }}>Сумма OK</span>
+                <span style={{ fontSize:11, fontWeight:700, color:"#2563eb" }}>{fmt(d.sum)}</span>
               </div>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-                <span style={{ fontSize:9, color:"#64748b" }}>Игроки</span>
+                <span style={{ fontSize:9, color:"#8ea4bd" }}>Игроки</span>
                 <span style={{ fontSize:11, fontWeight:700, color:"#e2e8f0" }}>{fmtN(d.players)}</span>
               </div>
               <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-                <span style={{ fontSize:9, color:"#64748b" }}>Avg депозит</span>
+                <span style={{ fontSize:9, color:"#8ea4bd" }}>Avg депозит</span>
                 <span style={{ fontSize:11, fontWeight:700, color:"#f59e0b" }}>${d.avgDep}</span>
               </div>
               <div style={{ marginTop:8, padding:"6px 8px", borderRadius:6,
                 background: d.dec > 40 ? "#3d0f0f" : d.dec > 25 ? "#3d2000" : "#0f2d1a",
                 display:"flex", justifyContent:"space-between" }}>
-                <span style={{ fontSize:9, color:"#94a3b8" }}>Decline rate</span>
+                <span style={{ fontSize:9, color:"#c1cfe0" }}>Decline rate</span>
                 <span style={{ fontSize:12, fontWeight:800, color: d.dec > 40 ? "#fca5a5" : d.dec > 25 ? "#fcd34d" : "#4ade80" }}>{d.dec}%</span>
               </div>
               {prev && (
-                <div style={{ marginTop:4, fontSize:9, color:"#64748b", textAlign:"center" }}>
+                <div style={{ marginTop:4, fontSize:9, color:"#8ea4bd", textAlign:"center" }}>
                   {d.players < prev.players ? `▼ –${((1-d.players/prev.players)*100).toFixed(0)}% игроков` : `▲ +${((d.players/prev.players-1)*100).toFixed(0)}% игроков`}
                 </div>
               )}
@@ -442,12 +468,12 @@ function DepositsView({ month, geo, product, isMobile }) {
 
       <div style={{ display: "grid", gridTemplateColumns: isMobile?"1fr":"1.2fr 1fr", gap: 12, marginBottom: 14 }}>
         {/* Decline by GEO */}
-        <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>📉 Decline rate по GEO ({isAll ? "Фев" : month})</div>
+        <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>📉 Decline rate по GEO ({isAll ? "Фев" : month})</div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={geoData} layout="vertical">
-              <XAxis type="number" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
-              <YAxis type="category" dataKey="geo" tick={{fill:"#94a3b8",fontSize:10}} axisLine={false} tickLine={false} width={30}/>
+              <XAxis type="number" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
+              <YAxis type="category" dataKey="geo" tick={{fill:"#c1cfe0",fontSize:10}} axisLine={false} tickLine={false} width={30}/>
               <Tooltip content={<CustomTooltip/>}/>
               <Bar dataKey="dec" name="Decline %" radius={[0,3,3,0]}>
                 {geoData.map((d,i) => <Cell key={i} fill={d.dec > 40 ? "#dc2626" : d.dec > 25 ? "#f59e0b" : "#22c55e"}/>)}
@@ -457,15 +483,15 @@ function DepositsView({ month, geo, product, isMobile }) {
         </div>
 
         {/* Sum by GEO */}
-        <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>💰 Сумма депозитов по GEO</div>
+        <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>💰 Сумма депозитов по GEO</div>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={geoData} layout="vertical">
-              <XAxis type="number" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
-              <YAxis type="category" dataKey="geo" tick={{fill:"#94a3b8",fontSize:10}} axisLine={false} tickLine={false} width={30}/>
+              <XAxis type="number" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
+              <YAxis type="category" dataKey="geo" tick={{fill:"#c1cfe0",fontSize:10}} axisLine={false} tickLine={false} width={30}/>
               <Tooltip content={<CustomTooltip/>}/>
               <Bar dataKey="sum" name="Сумма $" radius={[0,3,3,0]}>
-                {geoData.map((d,i) => <Cell key={i} fill={geo === d.geo ? "#1a56db" : "#1a56db66"}/>)}
+                {geoData.map((d,i) => <Cell key={i} fill={geo === d.geo ? "#2563eb" : "#1a56db66"}/>)}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
@@ -473,19 +499,19 @@ function DepositsView({ month, geo, product, isMobile }) {
       </div>
 
       {/* Decline trend over months by GEO */}
-      <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px", marginBottom:14 }}>
-        <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>📈 Динамика Decline по ключевым GEO (Nov→Feb)</div>
+      <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px", marginBottom:14 }}>
+        <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>📈 Динамика Decline по ключевым GEO (Nov→Feb)</div>
         <ResponsiveContainer width="100%" height={160}>
           <LineChart data={MONTHS.map(mo => ({
             month: mo,
             BR: DEP[mo].BR?.dec, AR: DEP[mo].AR?.dec, MX: DEP[mo].MX?.dec,
             PE: DEP[mo].PE?.dec, CL: DEP[mo].CL?.dec, CO: DEP[mo].CO?.dec
           }))}>
-            <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-            <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
+            <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+            <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
             <Tooltip content={<CustomTooltip/>}/>
-            <ReferenceLine y={25} stroke="#374151" strokeDasharray="4 4" label={{value:"норм.25%",fill:"#4b5563",fontSize:9}}/>
-            {[{k:"BR",c:"#22c55e"},{k:"AR",c:"#60a5fa"},{k:"MX",c:"#f59e0b"},{k:"PE",c:"#c084fc"},{k:"CL",c:"#94a3b8"},{k:"CO",c:"#dc2626"}].map(({k,c}) => (
+            <ReferenceLine y={25} stroke="#374151" strokeDasharray="4 4" label={{value:"норм.25%",fill:"#8ea4bd",fontSize:9}}/>
+            {[{k:"BR",c:"#22c55e"},{k:"AR",c:"#60a5fa"},{k:"MX",c:"#f59e0b"},{k:"PE",c:"#c084fc"},{k:"CL",c:"#c1cfe0"},{k:"CO",c:"#dc2626"}].map(({k,c}) => (
               <Line key={k} type="monotone" dataKey={k} name={`${GEO_FLAGS[k]} ${k}`} stroke={c} strokeWidth={geo===k?3:1.5} dot={{r:3,fill:c}} strokeOpacity={geo==="ALL"||geo===k?1:0.3}/>
             ))}
           </LineChart>
@@ -493,15 +519,15 @@ function DepositsView({ month, geo, product, isMobile }) {
       </div>
 
       {/* Monthly total + avg deposit */}
-      <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-        <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>📊 Сводная динамика: игроки + avg депозит</div>
+      <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+        <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>📊 Сводная динамика: игроки + avg депозит</div>
         <ResponsiveContainer width="100%" height={130}>
           <BarChart data={MONTHS.map(mo => ({month:mo, players: DEP[mo][geo]?.players||0, avgDep: DEP[mo][geo]?.avgDep||0}))}>
-            <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-            <YAxis yAxisId="l" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false}/>
-            <YAxis yAxisId="r" orientation="right" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} unit="$"/>
+            <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+            <YAxis yAxisId="l" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false}/>
+            <YAxis yAxisId="r" orientation="right" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} unit="$"/>
             <Tooltip content={<CustomTooltip/>}/>
-            <Bar yAxisId="l" dataKey="players" name="Игроки" fill="#1a56db" radius={[3,3,0,0]}/>
+            <Bar yAxisId="l" dataKey="players" name="Игроки" fill="#2563eb" radius={[3,3,0,0]}/>
             <Line yAxisId="r" type="monotone" dataKey="avgDep" name="Avg dep $" stroke="#f59e0b" strokeWidth={2} dot={{r:4,fill:"#f59e0b"}}/>
           </BarChart>
         </ResponsiveContainer>
@@ -537,19 +563,19 @@ function SportCasinoView({ month, geo, product, isMobile }) {
     <div style={{ padding: isMobile?"12px":"16px 20px", overflowY: "auto", height: "100%", WebkitOverflowScrolling:"touch" }}>
       {/* Product split overview */}
       <div style={{ display:"flex", flexDirection:isMobile?"column":"row", gap:12, marginBottom:16 }}>
-        <div style={{ flex:1, background:"#111827", border:"1px solid #7c3aed33", borderRadius:10, padding:"14px 16px", borderLeft:"3px solid #7c3aed" }}>
+        <div style={{ flex:1, background:"#0f172a", border:"1px solid #7c3aed33", borderRadius:10, padding:"14px 16px", borderLeft:"3px solid #7c3aed" }}>
           <div style={{ fontSize:10, color:"#7c3aed", fontWeight:700, marginBottom:6, textTransform:"uppercase" }}>🎰 Casino GGR</div>
           <div style={{ display:"flex", alignItems:"baseline", gap:8 }}><div style={{ fontSize:24, fontWeight:800, color:"#c4b5fd" }}>{fmt(casinoProfit)}</div>{!isAllMonth && <div style={{ fontSize:10, color:"#4c1d95" }}>~25% общего</div>}</div>
-          <div style={{ fontSize:10, color:"#94a3b8", marginTop:4 }}>92% GGR · {isAllMonth ? "Nov–Feb" : m} · 4% маржа</div>
-          <div style={{ marginTop:8, height:6, background:"#1e2535", borderRadius:3 }}>
+          <div style={{ fontSize:10, color:"#c1cfe0", marginTop:4 }}>92% GGR · {isAllMonth ? "Nov–Feb" : m} · 4% маржа</div>
+          <div style={{ marginTop:8, height:6, background:"#162033", borderRadius:3 }}>
             <div style={{ width:"92%", height:"100%", background:"#7c3aed", borderRadius:3 }}/>
           </div>
         </div>
-        <div style={{ flex:1, background:"#111827", border:"1px solid #22c55e33", borderRadius:10, padding:"14px 16px", borderLeft:"3px solid #22c55e" }}>
+        <div style={{ flex:1, background:"#0f172a", border:"1px solid #22c55e33", borderRadius:10, padding:"14px 16px", borderLeft:"3px solid #22c55e" }}>
           <div style={{ fontSize:10, color:"#22c55e", fontWeight:700, marginBottom:6, textTransform:"uppercase" }}>⚽ Sport GGR</div>
           <div style={{ display:"flex", alignItems:"baseline", gap:8 }}><div style={{ fontSize:24, fontWeight:800, color:"#86efac" }}>{fmt(sportProfit)}</div>{!isAllMonth && <div style={{ fontSize:10, color:"#14532d" }}>~25% общего</div>}</div>
-          <div style={{ fontSize:10, color:"#94a3b8", marginTop:4 }}>8% GGR · {isAllMonth ? "Nov–Feb" : m} · 4.6% маржа</div>
-          <div style={{ marginTop:8, height:6, background:"#1e2535", borderRadius:3 }}>
+          <div style={{ fontSize:10, color:"#c1cfe0", marginTop:4 }}>8% GGR · {isAllMonth ? "Nov–Feb" : m} · 4.6% маржа</div>
+          <div style={{ marginTop:8, height:6, background:"#162033", borderRadius:3 }}>
             <div style={{ width:"8%", height:"100%", background:"#22c55e", borderRadius:3 }}/>
           </div>
         </div>
@@ -558,12 +584,12 @@ function SportCasinoView({ month, geo, product, isMobile }) {
       <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12, marginBottom:14 }}>
         {/* Sport by type */}
         {(product === "sport" || product === "all") && (
-          <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>⚽ Профит по видам спорта</div>
+          <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>⚽ Профит по видам спорта</div>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={sportData} layout="vertical">
-                <XAxis type="number" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
-                <YAxis type="category" dataKey="name" tick={{fill:"#94a3b8",fontSize:9}} axisLine={false} tickLine={false} width={65}/>
+                <XAxis type="number" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
+                <YAxis type="category" dataKey="name" tick={{fill:"#c1cfe0",fontSize:9}} axisLine={false} tickLine={false} width={65}/>
                 <Tooltip content={<CustomTooltip/>}/>
                 <ReferenceLine x={0} stroke="#374151"/>
                 <Bar dataKey="profit" name="Профит $" radius={[0,3,3,0]}>
@@ -576,12 +602,12 @@ function SportCasinoView({ month, geo, product, isMobile }) {
 
         {/* Sport by GEO */}
         {(product === "sport" || product === "all") && (
-          <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>🌎 Спорт-профит по GEO (4 мес, total)</div>
+          <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>🌎 Спорт-профит по GEO (4 мес, total)</div>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={sportCountry}>
-                <XAxis dataKey="geo" tick={{fill:"#94a3b8",fontSize:9}} axisLine={false} tickLine={false}/>
-                <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
+                <XAxis dataKey="geo" tick={{fill:"#c1cfe0",fontSize:9}} axisLine={false} tickLine={false}/>
+                <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>`$${(v/1000).toFixed(0)}K`}/>
                 <Tooltip content={<CustomTooltip/>}/>
                 <ReferenceLine y={0} stroke="#374151"/>
                 <Bar dataKey="profit" name="Профит спорт $" radius={[3,3,0,0]}>
@@ -594,13 +620,13 @@ function SportCasinoView({ month, geo, product, isMobile }) {
 
         {/* Casino games */}
         {(product === "casino" || product === "all") && (
-          <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>🎰 Топ игры: маржа vs пользователи</div>
+          <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>🎰 Топ игры: маржа vs пользователи</div>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={casinoData}>
-                <XAxis dataKey="name" tick={{fill:"#94a3b8",fontSize:7}} axisLine={false} tickLine={false}/>
-                <YAxis yAxisId="l" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
-                <YAxis yAxisId="r" orientation="right" tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false}/>
+                <XAxis dataKey="name" tick={{fill:"#c1cfe0",fontSize:7}} axisLine={false} tickLine={false}/>
+                <YAxis yAxisId="l" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} unit="%"/>
+                <YAxis yAxisId="r" orientation="right" tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false}/>
                 <Tooltip content={<CustomTooltip/>}/>
                 <Bar yAxisId="l" dataKey="margin" name="Маржа %" radius={[3,3,0,0]}>
                   {casinoData.map((d,i) => <Cell key={i} fill={d.margin > 8 ? "#22c55e" : d.margin > 3 ? "#f59e0b" : d.margin < 1 ? "#dc2626" : "#60a5fa"}/>)}
@@ -613,19 +639,19 @@ function SportCasinoView({ month, geo, product, isMobile }) {
 
         {/* Casino profit by game */}
         {(product === "casino" || product === "all") && (
-          <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-            <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:8 }}>🎰 Прибыль топ-игр (Nov–Feb, всего)</div>
+          <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+            <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:8 }}>🎰 Прибыль топ-игр (Nov–Feb, всего)</div>
             {casinoData.sort((a,b)=>b.profit-a.profit).map((g, i) => (
               <div key={i} style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
-                <div style={{ width:100, fontSize:9, color:"#94a3b8", textAlign:"right", flexShrink:0 }}>{g.name}</div>
-                <div style={{ flex:1, height:16, background:"#1e2535", borderRadius:3, overflow:"hidden" }}>
+                <div style={{ width:100, fontSize:9, color:"#c1cfe0", textAlign:"right", flexShrink:0 }}>{g.name}</div>
+                <div style={{ flex:1, height:16, background:"#162033", borderRadius:3, overflow:"hidden" }}>
                   <div style={{ width:`${(g.profit/65000)*100}%`, height:"100%",
                     background: g.margin > 8 ? "#22c55e" : g.margin > 3 ? "#f59e0b" : "#dc2626",
                     borderRadius:3, display:"flex", alignItems:"center", paddingLeft:4 }}>
                     <span style={{ fontSize:8, color:"#fff", fontWeight:700, whiteSpace:"nowrap" }}>{fmt(g.profit)}</span>
                   </div>
                 </div>
-                <div style={{ width:36, fontSize:8, color:"#64748b", flexShrink:0 }}>{g.margin}%</div>
+                <div style={{ width:36, fontSize:8, color:"#8ea4bd", flexShrink:0 }}>{g.margin}%</div>
               </div>
             ))}
           </div>
@@ -641,7 +667,7 @@ function SportCasinoView({ month, geo, product, isMobile }) {
 const CJM_STAGES = [
   {
     id:1, icon:"📡", label:"Триггер", sublabel:"Первый контакт",
-    color:"#1a56db", colorLight:"#1e3a6e",
+    color:"#2563eb", colorLight:"#1e3a6e",
     users:677000, prevUsers:null,
     metric:"677K GA-сессий за 4 мес (GA4)", metric2:"85.7% mobile · DAU: 11K→4K –64% (GA4)",
     emotion:4, emotionLabel:"Интерес", emotionText:"«100% бонус — надо попробовать!»",
@@ -1507,11 +1533,11 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
   ];
 
   return (
-    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", height:"100%", overflow:"hidden", background:"#080e1c" }}>
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", height:"100%", overflow:"hidden", background:"#070b14" }}>
 
       {/* ══ LEFT: funnel list (sidebar on desktop, horizontal strip on mobile) ═══ */}
       {isMobile ? (
-        <div style={{ flexShrink:0, background:"#090f1e", borderBottom:"1px solid #142030" }}>
+        <div style={{ flexShrink:0, background:"#0a1020", borderBottom:"1px solid #142030" }}>
           <div style={{ display:"flex", overflowX:"auto", WebkitOverflowScrolling:"touch", padding:"8px 10px", gap:6 }}>
             {funnelUsers.map((s) => {
               const isActive = activeStage === s.id;
@@ -1519,12 +1545,12 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                 <div key={s.id} onClick={() => { setActiveStage(s.id); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); }} style={{
                   padding:"6px 10px", cursor:"pointer", flexShrink:0, borderRadius:8, minWidth:70, textAlign:"center",
                   background: isActive ? `${s.color}22` : "transparent",
-                  border: `1.5px solid ${isActive ? s.color : "#142030"}`,
+                  border: `1.5px solid ${isActive ? s.color : "#1c2b45"}`,
                   transition:"all 0.15s",
                 }}>
                   <div style={{ fontSize:14 }}>{s.icon}</div>
-                  <div style={{ fontSize:8, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#475569", marginTop:2, whiteSpace:"nowrap" }}>{s.id}. {s.label}</div>
-                  <div style={{ fontSize:7.5, color:isActive?s.color:"#263040", fontWeight:700, marginTop:1 }}>
+                  <div style={{ fontSize:8, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#8ea4bd", marginTop:2, whiteSpace:"nowrap" }}>{s.id}. {s.label}</div>
+                  <div style={{ fontSize:7.5, color:isActive?s.color:"#6580a0", fontWeight:700, marginTop:1 }}>
                     {s.dynUsers>=1000 ? `${(s.dynUsers/1000).toFixed(s.dynUsers>=100000?0:1)}K` : s.dynUsers}
                   </div>
                   {s.isCritical && <div style={{ width:4, height:4, borderRadius:"50%", background:"#dc2626", margin:"2px auto 0", boxShadow:"0 0 5px #dc262680" }}/>}
@@ -1534,13 +1560,13 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
           </div>
         </div>
       ) : (
-        <div style={{ width:200, flexShrink:0, background:"#090f1e", borderRight:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+        <div style={{ width:200, flexShrink:0, background:"#0a1020", borderRight:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
           <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid #142030" }}>
-            <div style={{ fontSize:9, color:"#1e3a5f", fontWeight:800, textTransform:"uppercase", letterSpacing:"1px" }}>ВОРОНКА CJM</div>
-            <div style={{ fontSize:8.5, color:"#334155", marginTop:2, display:"flex", gap:4, alignItems:"center", flexWrap:"wrap" }}>
-              <span style={{ color:"#1a56db66" }}>{isAllGeo ? "🌎 Все GEO" : `${GEO_FLAGS[geo]} ${GEO_NAMES[geo]}`}</span>
-              <span style={{ color:"#1e2d40" }}>·</span>
-              <span style={{ color:"#7c3aed55" }}>{isAllMonth ? "Nov–Feb" : m}</span>
+            <div style={{ fontSize:9, color:"#5b8fd6", fontWeight:800, textTransform:"uppercase", letterSpacing:"1px" }}>ВОРОНКА CJM</div>
+            <div style={{ fontSize:8.5, color:"#7a9ab8", marginTop:2, display:"flex", gap:4, alignItems:"center", flexWrap:"wrap" }}>
+              <span style={{ color:"#5b8fd6" }}>{isAllGeo ? "🌎 Все GEO" : `${GEO_FLAGS[geo]} ${GEO_NAMES[geo]}`}</span>
+            <span style={{ color:"#6580a0" }}>·</span>
+            <span style={{ color:"#9b7ae6" }}>{isAllMonth ? "Nov–Feb" : m}</span>
             </div>
           </div>
 
@@ -1559,11 +1585,11 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                 <div key={s.id}>
                   {i > 0 && (
                     <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:15, gap:4, padding:"0 10px" }}>
-                      <div style={{ flex:1, height:1, background:"#142030" }}/>
+                      <div style={{ flex:1, height:1, background:"#1c2b45" }}/>
                       <div style={{ fontSize:8, fontWeight:700, padding:"1px 5px", borderRadius:8, background:convBg, color:convColor, border:`1px solid ${isBigDrop?"#7f1d1d":isMedDrop?"#78350f":"#14532d"}` }}>
                         {conv}%
                       </div>
-                      <div style={{ flex:1, height:1, background:"#142030" }}/>
+                      <div style={{ flex:1, height:1, background:"#1c2b45" }}/>
                     </div>
                   )}
                   <div onClick={() => { setActiveStage(s.id); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); }} style={{
@@ -1574,10 +1600,10 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                   }}>
                     <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
                       <span style={{ fontSize:12 }}>{s.icon}</span>
-                      <span style={{ fontSize:9.5, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#475569", flex:1, lineHeight:1.2 }}>{s.id}. {s.label}</span>
+                      <span style={{ fontSize:9.5, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#8ea4bd", flex:1, lineHeight:1.2 }}>{s.id}. {s.label}</span>
                       {s.isCritical && <div style={{ width:5, height:5, borderRadius:"50%", background:"#dc2626", boxShadow:"0 0 5px #dc262680" }}/>}
                     </div>
-                    <div style={{ height:5, background:"#0d1626", borderRadius:3, overflow:"hidden" }}>
+                    <div style={{ height:5, background:"#0c1424", borderRadius:3, overflow:"hidden" }}>
                       <div style={{
                         width:`${barW}%`, height:"100%", borderRadius:3,
                         background: isActive ? `linear-gradient(90deg,${s.color},${s.color}99)` : `${s.color}44`,
@@ -1585,10 +1611,10 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                       }}/>
                     </div>
                     <div style={{ display:"flex", justifyContent:"space-between", marginTop:2 }}>
-                      <span style={{ fontSize:8, color:isActive?s.color:"#263040", fontWeight:isActive?700:400 }}>
+                      <span style={{ fontSize:8, color:isActive?s.color:"#6580a0", fontWeight:isActive?700:400 }}>
                         {s.dynUsers>=1000 ? `${(s.dynUsers/1000).toFixed(s.dynUsers>=100000?0:1)}K` : s.dynUsers}
                       </span>
-                      <span style={{ fontSize:7.5, color:"#1e2d40" }}>{((s.dynUsers/maxU)*100).toFixed(0)}%</span>
+                      <span style={{ fontSize:7.5, color:"#6580a0" }}>{((s.dynUsers/maxU)*100).toFixed(0)}%</span>
                     </div>
                   </div>
                 </div>
@@ -1596,14 +1622,14 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
             })}
           </div>
 
-          <div style={{ padding:"8px 12px", borderTop:"1px solid #142030", background:"#060c18" }}>
+          <div style={{ padding:"8px 12px", borderTop:"1px solid #142030", background:"#08101c" }}>
             {[
               {l:"Трафик → FTD", v:((funnelUsers[5]?.dynUsers/maxU)*100).toFixed(1)+"%", c:"#f87171"},
               {l:"FTD → Return", v:((funnelUsers[9]?.dynUsers/(funnelUsers[5]?.dynUsers||1))*100).toFixed(0)+"%", c:"#f87171"},
               {l:"Потенциал",    v:"+$430K/мес", c:"#4ade80"},
             ].map(r => (
               <div key={r.l} style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-                <span style={{ fontSize:8, color:"#1e2d40" }}>{r.l}</span>
+                <span style={{ fontSize:8, color:"#6580a0" }}>{r.l}</span>
                 <span style={{ fontSize:8, fontWeight:700, color:r.c }}>{r.v}</span>
               </div>
             ))}
@@ -1652,16 +1678,16 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                   {[1,2,3,4,5].map(i => (
                     <div key={i} style={{
                       width: i === stage?.emotion ? (isMobile?20:28) : (isMobile?12:18), height:isMobile?5:7, borderRadius:2,
-                      background: i <= (stage?.emotion||0) ? EMOTION_COLORS[(stage?.emotion||1)-1] : "#0d1626",
+                      background: i <= (stage?.emotion||0) ? EMOTION_COLORS[(stage?.emotion||1)-1] : "#0c1424",
                       opacity: i <= (stage?.emotion||0) ? (i===stage?.emotion?1:0.5) : 0.2,
                       transition:"all 0.3s",
                     }}/>
                   ))}
                 </div>
-                <span style={{ fontSize:isMobile?9:10, fontWeight:700, color:stage?EMOTION_COLORS[stage.emotion-1]:"#64748b" }}>
+                <span style={{ fontSize:isMobile?9:10, fontWeight:700, color:stage?EMOTION_COLORS[stage.emotion-1]:"#8ea4bd" }}>
                   {stage?EMOTION_LABELS[stage.emotion-1]:""}
                 </span>
-                {!isMobile && <span style={{ fontSize:9, color:"#2d3f55" }}>— {stage?.emotionText}</span>}
+                {!isMobile && <span style={{ fontSize:9, color:"#7a9ab8" }}>— {stage?.emotionText}</span>}
               </div>
             </div>
 
@@ -1676,7 +1702,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                   <div style={{ fontSize:22, fontWeight:800, lineHeight:1, color:convPct<25?"#fca5a5":convPct<60?"#fcd34d":"#4ade80" }}>
                     {convPct.toFixed(1)}%
                   </div>
-                  <div style={{ fontSize:8, color:"#1e2d40", marginTop:2 }}>конверсия</div>
+                  <div style={{ fontSize:8, color:"#6580a0", marginTop:2 }}>конверсия</div>
                 </div>
               )}
               {dropN > 0 && (
@@ -1690,15 +1716,15 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
           {/* KPI strip */}
           <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:isMobile?5:7 }}>
             {stage?.kpi?.map((k, i) => {
-              const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#1a56db","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
-              const sc = k.src ? srcColors[k.src] || ["#475569","#1e2535"] : null;
+              const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#2563eb","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
+              const sc = k.src ? srcColors[k.src] || ["#8ea4bd","#162033"] : null;
               return (
                 <div key={i} style={{
                   flex:1, padding:"6px 9px", borderRadius:8,
-                  background:"#060c18", border:`1px solid ${k.c}18`, borderTop:`2px solid ${k.c}55`,
+                  background:"#08101c", border:`1px solid ${k.c}18`, borderTop:`2px solid ${k.c}55`,
                 }}>
                   <div style={{ fontSize:12, fontWeight:800, color:k.c, lineHeight:1 }}>{k.v}</div>
-                  <div style={{ fontSize:8, color:"#1e2d40", marginTop:3, marginBottom: k.src?2:0 }}>{k.l}</div>
+                  <div style={{ fontSize:8, color:"#6580a0", marginTop:3, marginBottom: k.src?2:0 }}>{k.l}</div>
                   {k.src && sc && (
                     <div style={{ fontSize:7, fontWeight:700, padding:"1px 4px", borderRadius:3, background:sc[1], color:sc[0], border:`1px solid ${sc[0]}44`, display:"inline-block", letterSpacing:"0.3px" }}>
                       {k.src}
@@ -1711,12 +1737,12 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
         </div>
 
         {/* Inner tabs */}
-        <div style={{ display:"flex", alignItems:"center", padding:isMobile?"5px 10px":"6px 20px", borderBottom:"1px solid #142030", background:"#090f1e", flexShrink:0, gap:2, overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
+        <div style={{ display:"flex", alignItems:"center", padding:isMobile?"5px 10px":"6px 20px", borderBottom:"1px solid #142030", background:"#0a1020", flexShrink:0, gap:2, overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
           {innerTabs.map(t => (
             <button key={t.id} onClick={() => setInnerTab(t.id)} style={{
               padding:isMobile?"4px 8px":"5px 11px", borderRadius:6, border:"none", cursor:"pointer",
-              background:innerTab===t.id?"#1a56db":"transparent",
-              color:innerTab===t.id?"#fff":"#2d3f55",
+              background:innerTab===t.id?BRAND.blue:"transparent",
+              color:innerTab===t.id?"#fff":BRAND.textTertiary,
               fontSize:isMobile?9.5:10.5, fontWeight:innerTab===t.id?700:400, transition:"all 0.15s",
               display:"flex", alignItems:"center", gap:3, whiteSpace:"nowrap", flexShrink:0,
             }}>{t.icon} {t.label}</button>
@@ -1725,11 +1751,11 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
           {!isMobile && <>
             <button onClick={() => { if(activeStage>1){ setActiveStage(s=>s-1); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); } }} disabled={activeStage===1} style={{
               padding:"4px 9px", borderRadius:5, border:"1px solid #142030", background:"transparent",
-              color:activeStage===1?"#142030":"#2d3f55", cursor:activeStage===1?"default":"pointer", fontSize:10,
+              color:activeStage===1?"#5580a0":"#7a9ab8", cursor:activeStage===1?"default":"pointer", fontSize:10,
             }}>← {CJM_STAGES.find(s=>s.id===activeStage-1)?.label||""}</button>
             <button onClick={() => { if(activeStage<10){ setActiveStage(s=>s+1); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); } }} disabled={activeStage===10} style={{
               padding:"4px 9px", borderRadius:5, border:"1px solid #142030", background:"transparent",
-              color:activeStage===10?"#142030":"#2d3f55", cursor:activeStage===10?"default":"pointer", fontSize:10,
+              color:activeStage===10?"#5580a0":"#7a9ab8", cursor:activeStage===10?"default":"pointer", fontSize:10,
             }}>{CJM_STAGES.find(s=>s.id===activeStage+1)?.label||""} →</button>
           </>}
         </div>
@@ -1739,7 +1765,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
 
           {innerTab === "steps" && (
             <div>
-              <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
+              <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
                 👆 Нажми на шаг — детали, бизнес-импакт · ℹ️ = требует проверки · ⚠️ = оценка
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:6, marginBottom:12 }}>
@@ -1754,7 +1780,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           display:"flex", gap:9, alignItems:"center", padding:"9px 12px", borderRadius: isEx ? "8px 8px 0 0" : 8,
                           cursor:"pointer", userSelect:"none",
                           background: step.ok ? (isEx?"#0e2d1a":"#091a0f") : isCrit ? (isEx?"#2d1010":"#1e0808") : (isEx?"#121c2d":"#0d1220"),
-                          border:`1px solid ${step.ok?"#14532d55":isCrit?"#7f1d1d55":"#142030"}`,
+                          border:`1px solid ${step.ok?"#14532d55":isCrit?"#7f1d1d55":"#1c2b45"}`,
                           borderBottom: isEx ? "none" : undefined,
                           transition:"background 0.15s",
                         }}
@@ -1765,7 +1791,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           display:"flex", alignItems:"center", justifyContent:"center",
                           fontSize:9, fontWeight:800, color:step.ok?"#4ade80":"#fca5a5",
                         }}>{i+1}</div>
-                        <div style={{ fontSize:11.5, fontWeight:500, lineHeight:1.4, flex:1, color:step.ok?"#bbf7d0":isCrit?"#fca5a5":"#64748b" }}>
+                        <div style={{ fontSize:11.5, fontWeight:500, lineHeight:1.4, flex:1, color:step.ok?"#bbf7d0":isCrit?"#fca5a5":"#8ea4bd" }}>
                           {step.text.replace(/🔴\s?/g,"").replace(/✅\s?/g,"")}
                         </div>
                         <div style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0 }}>
@@ -1775,19 +1801,19 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                             </div>
                           )}
                           {step.dataNote && (
-                            <div style={{ fontSize:8, fontWeight:700, padding:"2px 5px", borderRadius:4, background:"#0a1628", color:"#64a0cc", border:"1px solid #1a3a5c44", whiteSpace:"nowrap" }}>
+                            <div style={{ fontSize:8, fontWeight:700, padding:"2px 5px", borderRadius:4, background:"#0a1628", color:"#7ab5dd", border:"1px solid #1a3a5c44", whiteSpace:"nowrap" }}>
                               {step.dataNote.startsWith("⚠️") ? "⚠️" : "ℹ️"}
                             </div>
                           )}
                           <span style={{ fontSize:11 }}>{step.ok?"✅":"❌"}</span>
-                          <span style={{ fontSize:9, color:"#1e2d40", transition:"transform 0.2s", display:"inline-block", transform:isEx?"rotate(180deg)":"none" }}>▼</span>
+                          <span style={{ fontSize:9, color:"#6580a0", transition:"transform 0.2s", display:"inline-block", transform:isEx?"rotate(180deg)":"none" }}>▼</span>
                         </div>
                       </div>
                       {isEx && (
                         <div style={{
                           padding:"10px 12px 12px",
                           background: step.ok ? "#091a0f" : isCrit ? "#1e0808" : "#0d1220",
-                          border:`1px solid ${step.ok?"#14532d55":isCrit?"#7f1d1d55":"#142030"}`,
+                          border:`1px solid ${step.ok?"#14532d55":isCrit?"#7f1d1d55":"#1c2b45"}`,
                           borderTop:`1px solid ${step.ok?"#14532d22":isCrit?"#7f1d1d22":"#1e2d40"}`,
                           borderRadius:"0 0 8px 8px",
                           marginBottom:0,
@@ -1795,15 +1821,15 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           {step.src && (
                             <div style={{ display:"flex", gap:5, alignItems:"center", marginBottom:6 }}>
                               {step.src.split(",").map((s,si) => {
-                                const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#1a56db","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
-                                const sc = srcColors[s.trim()] || ["#475569","#1e2535"];
+                                const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#2563eb","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
+                                const sc = srcColors[s.trim()] || ["#8ea4bd","#162033"];
                                 return <span key={si} style={{ fontSize:8, fontWeight:700, padding:"2px 5px", borderRadius:3, background:sc[1], color:sc[0], border:`1px solid ${sc[0]}55`, letterSpacing:"0.3px" }}>{s.trim()}</span>;
                               })}
-                              <span style={{ fontSize:9, color:"#1e2d40" }}>источник данных</span>
+                              <span style={{ fontSize:9, color:"#6580a0" }}>источник данных</span>
                             </div>
                           )}
                           {step.detail && (
-                            <div style={{ fontSize:11, color: step.ok?"#6ee7b7":"#94a3b8", lineHeight:1.65, marginBottom: step.impact ? 8 : 0 }}>
+                            <div style={{ fontSize:11, color: step.ok?"#6ee7b7":"#c1cfe0", lineHeight:1.65, marginBottom: step.impact ? 8 : 0 }}>
                               {step.detail}
                             </div>
                           )}
@@ -1826,7 +1852,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                               <span style={{ fontSize:12, flexShrink:0 }}>
                                 {step.dataNote.startsWith("⚠️") ? "⚠️" : "ℹ️"}
                               </span>
-                              <span style={{ fontSize:10, color:"#64a0cc", lineHeight:1.5 }}>
+                              <span style={{ fontSize:10, color:"#7ab5dd", lineHeight:1.5 }}>
                                 {step.dataNote.replace(/^[⚠️ℹ️]\s?/,"")}
                               </span>
                             </div>
@@ -1837,16 +1863,16 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                   );
                 })}
               </div>
-              <div style={{ padding:"9px 12px", background:"#060c18", border:"1px solid #142030", borderRadius:8 }}>
-                <div style={{ fontSize:8.5, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>Контекст сессии</div>
-                <div style={{ fontSize:10.5, color:"#2d3f55", lineHeight:1.6 }}>{stage?.context}</div>
+              <div style={{ padding:"9px 12px", background:"#08101c", border:"1px solid #142030", borderRadius:8 }}>
+                <div style={{ fontSize:8.5, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:3 }}>Контекст сессии</div>
+                <div style={{ fontSize:10.5, color:"#7a9ab8", lineHeight:1.6 }}>{stage?.context}</div>
               </div>
             </div>
           )}
 
           {innerTab === "barriers" && (
             <div>
-              <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
+              <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
                 👆 Нажми на барьер — суть проблемы · 💸 = бизнес-импакт · ⚠️ = оценочно
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
@@ -1860,9 +1886,9 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                   const ic = lvl===3?"🚨":lvl===2?"⛔":lvl>=1?"❌":"⚠️";
                   const bgBase = lvl===3?"#2d0a0a":lvl===2?"#1e0808":lvl>=1?"#160c0c":"#0d1220";
                   const bgEx = lvl>=1?"#3d1010":"#121c2d";
-                  const bc = lvl>=2?"#7f1d1d55":lvl>=1?"#7f1d1d33":"#142030";
+                  const bc = lvl>=2?"#7f1d1d55":lvl>=1?"#7f1d1d33":"#1c2b45";
                   const bl = lvl>=2?"#dc2626":lvl>=1?"#7f1d1d":"#1e2d40";
-                  const tc = lvl>=1?"#fca5a5":"#475569";
+                  const tc = lvl>=1?"#fca5a5":"#8ea4bd";
                   return (
                     <div key={i}>
                       <div
@@ -1880,8 +1906,8 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                         <span style={{ fontSize:12, color:tc, lineHeight:1.4, flex:1, fontWeight:500 }}>{txt.replace(/🔴+\s?/g,"")}</span>
                         <div style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0 }}>
                           {impact && <div style={{ fontSize:8, padding:"2px 5px", borderRadius:4, background:"#3d0a0a", color:"#fca5a5", border:"1px solid #7f1d1d22", fontWeight:700 }}>💸</div>}
-                          {b.dataNote && <div style={{ fontSize:8, padding:"2px 5px", borderRadius:4, background:"#0a1628", color:"#64a0cc", border:"1px solid #1a3a5c44", fontWeight:700 }}>{b.dataNote.startsWith("⚠️")?"⚠️":"ℹ️"}</div>}
-                          <span style={{ fontSize:9, color:"#1e2d40", display:"inline-block", transform:isEx?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
+                          {b.dataNote && <div style={{ fontSize:8, padding:"2px 5px", borderRadius:4, background:"#0a1628", color:"#7ab5dd", border:"1px solid #1a3a5c44", fontWeight:700 }}>{b.dataNote.startsWith("⚠️")?"⚠️":"ℹ️"}</div>}
+                          <span style={{ fontSize:9, color:"#6580a0", display:"inline-block", transform:isEx?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
                         </div>
                       </div>
                       {isEx && (detail || impact) && (
@@ -1896,14 +1922,14 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           {b.src && (
                           <div style={{ display:"flex", gap:5, alignItems:"center", marginBottom:6 }}>
                             {b.src.split(",").map((s,si) => {
-                              const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#1a56db","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
-                              const sc = srcColors[s.trim()] || ["#475569","#1e2535"];
+                              const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#2563eb","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
+                              const sc = srcColors[s.trim()] || ["#8ea4bd","#162033"];
                               return <span key={si} style={{ fontSize:8, fontWeight:700, padding:"2px 5px", borderRadius:3, background:sc[1], color:sc[0], border:`1px solid ${sc[0]}55`, letterSpacing:"0.3px" }}>{s.trim()}</span>;
                             })}
-                            <span style={{ fontSize:9, color:"#1e2d40" }}>источник</span>
+                            <span style={{ fontSize:9, color:"#6580a0" }}>источник</span>
                           </div>
                         )}
-                        {detail && <div style={{ fontSize:11, color:"#94a3b8", lineHeight:1.65, marginBottom:(impact||b.dataNote)?8:0 }}>{detail}</div>}
+                        {detail && <div style={{ fontSize:11, color:"#c1cfe0", lineHeight:1.65, marginBottom:(impact||b.dataNote)?8:0 }}>{detail}</div>}
                           {impact && (
                             <div style={{ display:"flex", gap:6, padding:"7px 10px", background:"#3d0a0a", borderRadius:6, border:"1px solid #7f1d1d44", marginBottom:b.dataNote?6:0 }}>
                               <span style={{ fontSize:12 }}>💸</span>
@@ -1913,7 +1939,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           {b.dataNote && (
                             <div style={{ display:"flex", gap:6, padding:"6px 10px", background:"#0a1628", borderRadius:6, border:"1px solid #1a3a5c55" }}>
                               <span style={{ fontSize:11, flexShrink:0 }}>{b.dataNote.startsWith("⚠️")?"⚠️":"ℹ️"}</span>
-                              <span style={{ fontSize:10, color:"#64a0cc", lineHeight:1.5 }}>{b.dataNote.replace(/^[⚠️ℹ️]\s?/,"")}</span>
+                              <span style={{ fontSize:10, color:"#7ab5dd", lineHeight:1.5 }}>{b.dataNote.replace(/^[⚠️ℹ️]\s?/,"")}</span>
                             </div>
                           )}
                         </div>
@@ -1927,7 +1953,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
 
           {innerTab === "actions" && (
             <div>
-              <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
+              <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
                 👆 Нажми на действие — как реализовать · 📈 = ожидаемый результат · ℹ️ = уточнить
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
@@ -1941,7 +1967,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                   const cfgs = [
                     {bg:"#091a0f",bgEx:"#0e2d1a",bc:"#14532d44",tagBg:"#14532d",tagC:"#4ade80",txtC:"#bbf7d0",resBg:"#0a2010",resC:"#6ee7b7"},
                     {bg:"#0d1a07",bgEx:"#142010",bc:"#36531444",tagBg:"#3f6212",tagC:"#a3e635",txtC:"#d9f99d",resBg:"#1a2c07",resC:"#a3e635"},
-                    {bg:"#0d1220",bgEx:"#121c2d",bc:"#142030",tagBg:"#1e293b",tagC:"#64748b",txtC:"#64748b",resBg:"#1a2030",resC:"#64748b"},
+                    {bg:"#0d1220",bgEx:"#121c2d",bc:"#1c2b45",tagBg:"#1e293b",tagC:"#8ea4bd",txtC:"#8ea4bd",resBg:"#1a2030",resC:"#8ea4bd"},
                   ];
                   const cfg = cfgs[p] || cfgs[2];
                   return (
@@ -1963,8 +1989,8 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                         <span style={{ fontSize:11.5, fontWeight:500, color:cfg.txtC, lineHeight:1.4, flex:1 }}>{txt}</span>
                         <div style={{ display:"flex", alignItems:"center", gap:4, flexShrink:0 }}>
                           {result && <div style={{ fontSize:8, padding:"2px 5px", borderRadius:4, background:cfg.tagBg+"44", color:cfg.tagC, fontWeight:700, border:`1px solid ${cfg.tagBg}44` }}>📈</div>}
-                          {a.dataNote && <div style={{ fontSize:8, padding:"2px 5px", borderRadius:4, background:"#0a1628", color:"#64a0cc", border:"1px solid #1a3a5c44", fontWeight:700 }}>{a.dataNote.startsWith("⚠️")?"⚠️":"ℹ️"}</div>}
-                          <span style={{ fontSize:9, color:"#1e2d40", display:"inline-block", transform:isEx?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
+                          {a.dataNote && <div style={{ fontSize:8, padding:"2px 5px", borderRadius:4, background:"#0a1628", color:"#7ab5dd", border:"1px solid #1a3a5c44", fontWeight:700 }}>{a.dataNote.startsWith("⚠️")?"⚠️":"ℹ️"}</div>}
+                          <span style={{ fontSize:9, color:"#6580a0", display:"inline-block", transform:isEx?"rotate(180deg)":"none", transition:"transform 0.2s" }}>▼</span>
                         </div>
                       </div>
                       {isEx && (detail || result) && (
@@ -1978,14 +2004,14 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           {a.src && (
                             <div style={{ display:"flex", gap:5, alignItems:"center", marginBottom:6 }}>
                               {a.src.split(",").map((s,si) => {
-                                const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#1a56db","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
-                                const sc = srcColors[s.trim()] || ["#475569","#1e2535"];
+                                const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#2563eb","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
+                                const sc = srcColors[s.trim()] || ["#8ea4bd","#162033"];
                                 return <span key={si} style={{ fontSize:8, fontWeight:700, padding:"2px 5px", borderRadius:3, background:sc[1], color:sc[0], border:`1px solid ${sc[0]}55`, letterSpacing:"0.3px" }}>{s.trim()}</span>;
                               })}
-                              <span style={{ fontSize:9, color:"#1e2d40" }}>источник</span>
+                              <span style={{ fontSize:9, color:"#6580a0" }}>источник</span>
                             </div>
                           )}
-                          {detail && <div style={{ fontSize:11, color:"#64748b", lineHeight:1.65, marginBottom:(result||a.dataNote)?8:0 }}>{detail}</div>}
+                          {detail && <div style={{ fontSize:11, color:"#8ea4bd", lineHeight:1.65, marginBottom:(result||a.dataNote)?8:0 }}>{detail}</div>}
                           {result && (
                             <div style={{ display:"flex", gap:6, padding:"7px 10px", background:cfg.resBg, borderRadius:6, border:`1px solid ${cfg.tagBg}44`, marginBottom:a.dataNote?6:0 }}>
                               <span style={{ fontSize:12 }}>📈</span>
@@ -1995,7 +2021,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                           {a.dataNote && (
                             <div style={{ display:"flex", gap:6, padding:"6px 10px", background:"#0a1628", borderRadius:6, border:"1px solid #1a3a5c55" }}>
                               <span style={{ fontSize:11, flexShrink:0 }}>{a.dataNote.startsWith("⚠️")?"⚠️":"ℹ️"}</span>
-                              <span style={{ fontSize:10, color:"#64a0cc", lineHeight:1.5 }}>{a.dataNote.replace(/^[⚠️ℹ️]\s?/,"")}</span>
+                              <span style={{ fontSize:10, color:"#7ab5dd", lineHeight:1.5 }}>{a.dataNote.replace(/^[⚠️ℹ️]\s?/,"")}</span>
                             </div>
                           )}
                         </div>
@@ -2005,8 +2031,8 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                 })}
               </div>
               {stage?.ab && (
-                <div style={{ marginTop:10, padding:"9px 12px", background:"#060c18", border:"1px solid #142030", borderRadius:8 }}>
-                  <div style={{ fontSize:8.5, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", marginBottom:5 }}>🧪 A/B Гипотезы</div>
+                <div style={{ marginTop:10, padding:"9px 12px", background:"#08101c", border:"1px solid #142030", borderRadius:8 }}>
+                  <div style={{ fontSize:8.5, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:5 }}>🧪 A/B Гипотезы</div>
                   {stage.ab.map((h,i) => (
                     <div key={i} style={{ fontSize:10.5, color:"#2d4a6a", marginBottom:4, lineHeight:1.5 }}>{h}</div>
                   ))}
@@ -2018,20 +2044,20 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
           {innerTab === "metrics" && (
             <div>
               {/* Monthly trend for this stage */}
-              <div style={{ background:"#060c18", border:"1px solid #142030", borderRadius:8, padding:"12px 14px", marginBottom:10 }}>
-                <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", marginBottom:8 }}>📈 Динамика этапа по месяцам</div>
+              <div style={{ background:"#08101c", border:"1px solid #142030", borderRadius:8, padding:"12px 14px", marginBottom:10 }}>
+                <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:8 }}>📈 Динамика этапа по месяцам</div>
                 <ResponsiveContainer width="100%" height={90}>
                   <AreaChart data={sparkData}>
                     <defs>
                       <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={stage?.color||"#1a56db"} stopOpacity={0.4}/>
-                        <stop offset="100%" stopColor={stage?.color||"#1a56db"} stopOpacity={0}/>
+                        <stop offset="0%" stopColor={stage?.color||"#2563eb"} stopOpacity={0.4}/>
+                        <stop offset="100%" stopColor={stage?.color||"#2563eb"} stopOpacity={0}/>
                       </linearGradient>
                     </defs>
                     <XAxis dataKey="month" tick={{fill:"#1e2d40",fontSize:9}} axisLine={false} tickLine={false}/>
                     <YAxis tick={{fill:"#1e2d40",fontSize:9}} axisLine={false} tickLine={false} tickFormatter={v=>v>=1000?`${(v/1000).toFixed(0)}K`:v} width={35}/>
                     <Tooltip content={<CustomTooltip/>}/>
-                    <Area type="monotone" dataKey="val" name="Пользователей" stroke={stage?.color||"#1a56db"} strokeWidth={2} fill="url(#sparkGrad)"/>
+                    <Area type="monotone" dataKey="val" name="Пользователей" stroke={stage?.color||"#2563eb"} strokeWidth={2} fill="url(#sparkGrad)"/>
                     {!isAllMonth && sparkData.map((d,i) => d.month===m && (
                       <ReferenceLine key={i} x={m} stroke={stage?.color} strokeDasharray="3 3" strokeOpacity={0.5}/>
                     ))}
@@ -2040,26 +2066,26 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
               </div>
 
               <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8, marginBottom:10 }}>
-                <div style={{ padding:"10px 12px", background:"#060c18", border:"1px solid #142030", borderRadius:8 }}>
-                  <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", marginBottom:5 }}>Метрика</div>
-                  <div style={{ fontSize:12, fontWeight:700, color:"#94a3b8", marginBottom:3 }}>{stage?.metric}</div>
-                  <div style={{ fontSize:10.5, color:"#2d3f55" }}>{stage?.metric2}</div>
+                <div style={{ padding:"10px 12px", background:"#08101c", border:"1px solid #142030", borderRadius:8 }}>
+                  <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:5 }}>Метрика</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:"#c1cfe0", marginBottom:3 }}>{stage?.metric}</div>
+                  <div style={{ fontSize:10.5, color:"#7a9ab8" }}>{stage?.metric2}</div>
                 </div>
-                <div style={{ padding:"10px 12px", background:"#060c18", border:"1px solid #142030", borderRadius:8 }}>
-                  <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", marginBottom:5 }}>Фильтр · JTBD</div>
-                  <div style={{ fontSize:9.5, color:"#2d3f55", lineHeight:1.7 }}>
-                    <span style={{ color:"#1a56db66" }}>{isAllGeo?"🌎 Все GEO":`${GEO_FLAGS[geo]} ${GEO_NAMES[geo]}`}</span> ·{" "}
-                    <span style={{ color:"#7c3aed55" }}>{isAllMonth?"Nov–Feb":m}</span><br/>
+                <div style={{ padding:"10px 12px", background:"#08101c", border:"1px solid #142030", borderRadius:8 }}>
+                  <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:5 }}>Фильтр · JTBD</div>
+                  <div style={{ fontSize:9.5, color:"#7a9ab8", lineHeight:1.7 }}>
+                    <span style={{ color:"#5b8fd6" }}>{isAllGeo?"🌎 Все GEO":`${GEO_FLAGS[geo]} ${GEO_NAMES[geo]}`}</span> ·{" "}
+                    <span style={{ color:"#9b7ae6" }}>{isAllMonth?"Nov–Feb":m}</span><br/>
                     {stage?.jtbd}
                   </div>
                 </div>
               </div>
 
-              <div style={{ padding:"10px 14px", background:"#060c18", border:"1px solid #142030", borderRadius:8 }}>
-                <div style={{ fontSize:9, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", marginBottom:6 }}>GA4 / WM события</div>
+              <div style={{ padding:"10px 14px", background:"#08101c", border:"1px solid #142030", borderRadius:8 }}>
+                <div style={{ fontSize:9, color:"#6580a0", fontWeight:700, textTransform:"uppercase", marginBottom:6 }}>GA4 / WM события</div>
                 <div style={{ display:"flex", flexWrap:"wrap", gap:5 }}>
                   {stage?.events?.map((ev,i) => (
-                    <span key={i} style={{ fontSize:9, color:"#2d4a6a", padding:"3px 8px", background:"#080e1c", borderRadius:4, border:"1px solid #142030", fontFamily:"monospace" }}>{ev}</span>
+                    <span key={i} style={{ fontSize:9, color:"#2d4a6a", padding:"3px 8px", background:"#070b14", borderRadius:4, border:"1px solid #142030", fontFamily:"monospace" }}>{ev}</span>
                   ))}
                 </div>
               </div>
@@ -2069,9 +2095,9 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
       </div>
 
       {/* ══ RIGHT: Sankey + quick stats ══════════════════════════ */}
-      {!isMobile && <div style={{ width:190, flexShrink:0, background:"#090f1e", borderLeft:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      {!isMobile && <div style={{ width:190, flexShrink:0, background:"#0a1020", borderLeft:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
         <div style={{ padding:"8px 12px 6px", borderBottom:"1px solid #142030" }}>
-          <div style={{ fontSize:8.5, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px" }}>Поток</div>
+          <div style={{ fontSize:8.5, color:"#6580a0", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px" }}>Поток</div>
         </div>
         <div style={{ flex:1, overflowY:"auto", padding:"6px 8px" }}>
           {funnelUsers.map((s, i) => {
@@ -2100,7 +2126,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
                     {w > 28 && <span style={{ fontSize:7.5, color:"#fff", fontWeight:700 }}>{s.dynUsers>=1000?`${(s.dynUsers/1000).toFixed(s.dynUsers>=100000?0:1)}K`:s.dynUsers}</span>}
                   </div>
                 </div>
-                <div style={{ textAlign:"center", fontSize:7.5, color:isActive?s.color:"#1e2d40", fontWeight:isActive?700:400, marginBottom:1 }}>
+                <div style={{ textAlign:"center", fontSize:7.5, color:isActive?s.color:"#6580a0", fontWeight:isActive?700:400, marginBottom:1 }}>
                   {s.icon} {s.label}
                 </div>
               </div>
@@ -2169,8 +2195,8 @@ function GeoView({ month, geo, product, isMobile }) {
       <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(3,1fr)", gap:10, marginBottom:14 }}>
         {radarData.map(d => (
           <div key={d.g} style={{
-            background:"#111827",
-            border:`2px solid ${geo === d.g ? "#1a56db" : "#1f2d40"}`,
+            background:"#0f172a",
+            border:`2px solid ${geo === d.g ? "#2563eb" : "#1e2d4a"}`,
             borderRadius:10, padding:"12px 14px",
             boxShadow: geo === d.g ? "0 0 16px #1a56db40" : "none"
           }}>
@@ -2183,7 +2209,7 @@ function GeoView({ month, geo, product, isMobile }) {
               }}>{d.score}/100</div>
             </div>
             {[
-              ["Депозиты", fmt(d.depSum), d.depSum > 200000 ? "#22c55e" : "#94a3b8"],
+              ["Депозиты", fmt(d.depSum), d.depSum > 200000 ? "#22c55e" : "#c1cfe0"],
               ["Игроки · "+m, fmtN(d.players) + (d.momPlayers ? (parseInt(d.momPlayers)>0?" ▲":" ▼") : ""), "#60a5fa"],
               ["Avg депозит", `$${d.avgDep}`, "#f59e0b"],
               ["Decline rate", `${d.dec}%`, d.dec > 40 ? "#dc2626" : d.dec > 25 ? "#f59e0b" : "#22c55e"],
@@ -2191,12 +2217,12 @@ function GeoView({ month, geo, product, isMobile }) {
               ["Спорт GGR", d.sportProfit > 0 ? `+${fmt(d.sportProfit)}` : fmt(d.sportProfit), d.sportProfit > 0 ? "#22c55e" : "#ef4444"],
             ].map(([label, val, col]) => (
               <div key={label} style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-                <span style={{ fontSize:9.5, color:"#64748b" }}>{label}</span>
+                <span style={{ fontSize:9.5, color:"#8ea4bd" }}>{label}</span>
                 <span style={{ fontSize:9.5, fontWeight:700, color:col }}>{val}</span>
               </div>
             ))}
             {/* Score bar */}
-            <div style={{ marginTop:8, height:4, background:"#1e2535", borderRadius:2 }}>
+            <div style={{ marginTop:8, height:4, background:"#162033", borderRadius:2 }}>
               <div style={{ width:`${d.score}%`, height:"100%",
                 background: d.score > 65 ? "#22c55e" : d.score > 40 ? "#f59e0b" : "#dc2626",
                 borderRadius:2, transition:"width 0.5s" }}/>
@@ -2207,8 +2233,8 @@ function GeoView({ month, geo, product, isMobile }) {
 
       {/* GEO comparison charts */}
       <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12 }}>
-        <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>🏦 Avg депозит по GEO (динамика){!isAllMonth ? ` · отмечен ${m}` : ""}</div>
+        <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>🏦 Avg депозит по GEO (динамика){!isAllMonth ? ` · отмечен ${m}` : ""}</div>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={MONTHS.map(mo => ({
               month: mo,
@@ -2216,19 +2242,19 @@ function GeoView({ month, geo, product, isMobile }) {
               MX: DEP[mo].MX?.avgDep, PE: DEP[mo].PE?.avgDep,
               CL: DEP[mo].CL?.avgDep, UY: DEP[mo].UY?.avgDep
             }))}>
-              <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-              <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false} unit="$"/>
+              <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false} unit="$"/>
               <Tooltip content={<CustomTooltip/>}/>
               {!isAllMonth && <ReferenceLine x={m} stroke="#334155" strokeDasharray="3 3"/>}
-              {[{k:"BR",c:"#22c55e"},{k:"AR",c:"#60a5fa"},{k:"MX",c:"#f59e0b"},{k:"PE",c:"#c084fc"},{k:"CL",c:"#94a3b8"},{k:"UY",c:"#f97316"}].map(({k,c}) => (
+              {[{k:"BR",c:"#22c55e"},{k:"AR",c:"#60a5fa"},{k:"MX",c:"#f59e0b"},{k:"PE",c:"#c084fc"},{k:"CL",c:"#c1cfe0"},{k:"UY",c:"#f97316"}].map(({k,c}) => (
                 <Line key={k} type="monotone" dataKey={k} name={`${GEO_FLAGS[k]} ${k} avg$`} stroke={c} strokeWidth={geo===k?3:1.5} dot={{r:3}} strokeOpacity={geo==="ALL"||geo===k?1:0.4}/>
               ))}
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
-          <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>👥 Игроки по GEO (динамика)</div>
+        <div style={{ background:"#0f172a", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
+          <div style={{ fontSize:11, fontWeight:700, color:"#c1cfe0", marginBottom:10 }}>👥 Игроки по GEO (динамика)</div>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={MONTHS.map(mo => ({
               month: mo,
@@ -2236,10 +2262,10 @@ function GeoView({ month, geo, product, isMobile }) {
               MX: DEP[mo].MX?.players, PE: DEP[mo].PE?.players,
               CL: DEP[mo].CL?.players, UY: DEP[mo].UY?.players
             }))}>
-              <XAxis dataKey="month" tick={{fill:"#64748b",fontSize:10}} axisLine={false} tickLine={false}/>
-              <YAxis tick={{fill:"#64748b",fontSize:9}} axisLine={false} tickLine={false}/>
+              <XAxis dataKey="month" tick={{fill:"#8ea4bd",fontSize:10}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fill:"#8ea4bd",fontSize:9}} axisLine={false} tickLine={false}/>
               <Tooltip content={<CustomTooltip/>}/>
-              {[{k:"AR",c:"#60a5fa"},{k:"BR",c:"#22c55e"},{k:"MX",c:"#f59e0b"},{k:"PE",c:"#c084fc"},{k:"CL",c:"#94a3b8"}].map(({k,c}) => (
+              {[{k:"AR",c:"#60a5fa"},{k:"BR",c:"#22c55e"},{k:"MX",c:"#f59e0b"},{k:"PE",c:"#c084fc"},{k:"CL",c:"#c1cfe0"}].map(({k,c}) => (
                 <Line key={k} type="monotone" dataKey={k} name={`${GEO_FLAGS[k]} ${k}`} stroke={c} strokeWidth={geo===k?3:1.5} dot={{r:3}} strokeOpacity={geo==="ALL"||geo===k?1:0.4}/>
               ))}
             </LineChart>
@@ -2257,20 +2283,20 @@ function App() {
   const [month, setMonth] = useState("ALL");
   const [geo, setGeo] = useState("ALL");
   const [product, setProduct] = useState("all");
-  const [tab, setTab] = useState("overview");
+  const [tab, setTab] = useState("cjm");
   const isMobile = useIsMobile();
 
-  const bg = "#080e1c";
-  const surface = "#0d1526";
-  const border = "#1a2640";
+  const bg = BRAND.bg;
+  const surface = BRAND.surface;
+  const border = BRAND.border;
 
   const geos = ["ALL","BR","AR","MX","PE","CL","UY","CO"];
   const tabs = [
+    {id:"cjm", label:"🗺 CJM Воронка"},
     {id:"overview", label:"📊 Сводка"},
     {id:"deposits", label:"💳 Депозиты"},
     {id:"product", label:"🎮 Casino / Sport"},
     {id:"geo", label:"🌎 GEO-анализ"},
-    {id:"cjm", label:"🗺 CJM Воронка"},
   ];
 
   // Get current month's key metrics for header display
@@ -2279,39 +2305,39 @@ function App() {
   const pm = prevM ? DEP[prevM]?.[geo] : null;
 
   return (
-    <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", background:bg, color:"#e2e8f0", height:"100vh", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+    <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", background:bg, color:BRAND.textPrimary, height:"100vh", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
       {/* ══ HEADER ══════════════════════════════════════════════════ */}
-      <div style={{ background:surface, borderBottom:`1px solid ${border}`, padding:isMobile?"8px 10px":"10px 18px", flexShrink:0 }}>
+      <div style={{ background:BRAND.surface, borderBottom:`1px solid ${BRAND.border}`, padding:isMobile?"8px 10px":"10px 18px", flexShrink:0 }}>
         {/* Row 1: Logo + title + NSM badges */}
         <div style={{ display:"flex", alignItems:"center", gap:isMobile?8:12, marginBottom:isMobile?6:10, flexWrap:isMobile?"wrap":"nowrap" }}>
-          <div style={{ width:isMobile?28:34,height:isMobile?28:34,borderRadius:8,background:"linear-gradient(135deg,#1a56db,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:isMobile?13:16,flexShrink:0 }}>💎</div>
+          <div style={{ width:isMobile?28:34,height:isMobile?28:34,borderRadius:8,background:`linear-gradient(135deg,${BRAND.blue},${BRAND.gold})`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:isMobile?13:16,flexShrink:0 }}>💎</div>
           <div style={{ minWidth:0 }}>
-            <div style={{ fontSize:isMobile?11:13,fontWeight:800,color:"#fff",letterSpacing:"-0.3px" }}>SapphireBet · CJM Analytics</div>
-            {!isMobile && <div style={{ fontSize:9,color:"#64748b" }}>Nov 2025 – Feb 2026 · LATAM · White Label 1xBet · Источники: MIO = Management.io · PBI = Power BI · GA4 = Google Analytics</div>}
+            <div style={{ fontSize:isMobile?11:13,fontWeight:800,color:"#fff",letterSpacing:"-0.3px" }}>SapphireBet <span style={{color:BRAND.gold}}>·</span> CJM Analytics</div>
+            {!isMobile && <div style={{ fontSize:9,color:BRAND.textTertiary }}>Nov 2025 – Feb 2026 · LATAM · White Label 1xBet · Источники: MIO = Management.io · PBI = Power BI · GA4 = Google Analytics</div>}
           </div>
           {!isMobile && <div style={{ marginLeft:"auto",display:"flex",gap:8,alignItems:"center" }}>
             {[
-              {l:"Total GGR gross (MIO)",v:"$1.07M",c:"#7c3aed"},
-              {l:"Casino GGR gross (MIO)",v:"$933K",c:"#a855f7"},
-              {l:"Sport GGR gross (MIO)",v:"$133K",c:"#22c55e"},
-              {l:"Dep OK (PBI)",v:"$3.67M",c:"#1a56db"},
-              {l:"D1 Retention (GA4)",v:"3.75%",c:"#dc2626"},
-              {l:"Decline avg MIO / PBI",v:"35% / 20%",c:"#f59e0b"},
+              {l:"Total GGR gross (MIO)",v:"$1.07M",c:BRAND.gold},
+              {l:"Casino GGR gross (MIO)",v:"$933K",c:BRAND.purpleLight},
+              {l:"Sport GGR gross (MIO)",v:"$133K",c:BRAND.green},
+              {l:"Dep OK (PBI)",v:"$3.67M",c:BRAND.blueLight},
+              {l:"D1 Retention (GA4)",v:"3.75%",c:BRAND.red},
+              {l:"Decline avg MIO / PBI",v:"35% / 20%",c:BRAND.amber},
             ].map(m => (
-              <div key={m.l} style={{ background:"#111827",border:`1px solid ${m.c}33`,borderRadius:6,padding:"4px 9px",textAlign:"center" }}>
+              <div key={m.l} style={{ background:BRAND.card,border:`1px solid ${m.c}33`,borderRadius:6,padding:"4px 9px",textAlign:"center" }}>
                 <div style={{ fontSize:11,fontWeight:800,color:m.c }}>{m.v}</div>
-                <div style={{ fontSize:8,color:"#64748b" }}>{m.l}</div>
+                <div style={{ fontSize:8,color:BRAND.textTertiary }}>{m.l}</div>
               </div>
             ))}
           </div>}
           {isMobile && <div style={{ marginLeft:"auto",display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end" }}>
             {[
-              {v:"$1.07M",c:"#7c3aed"},
-              {v:"$3.67M",c:"#1a56db"},
-              {v:"3.75%",c:"#dc2626"},
+              {v:"$1.07M",c:BRAND.gold},
+              {v:"$3.67M",c:BRAND.blueLight},
+              {v:"3.75%",c:BRAND.red},
             ].map((m,i) => (
-              <div key={i} style={{ background:"#111827",border:`1px solid ${m.c}33`,borderRadius:4,padding:"2px 6px",textAlign:"center" }}>
+              <div key={i} style={{ background:BRAND.card,border:`1px solid ${m.c}33`,borderRadius:4,padding:"2px 6px",textAlign:"center" }}>
                 <div style={{ fontSize:9,fontWeight:800,color:m.c }}>{m.v}</div>
               </div>
             ))}
@@ -2322,10 +2348,10 @@ function App() {
         <div style={{ display:"flex", gap:isMobile?8:16, alignItems:"center", flexWrap:"wrap" }}>
           {/* Month */}
           <div style={{ display:"flex", alignItems:"center", gap:isMobile?4:6 }}>
-            <span style={{ fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>Период</span>
+            <span style={{ fontSize:9,color:BRAND.textTertiary,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>Период</span>
             <div style={{ display:"flex",gap:3 }}>
               {["ALL","Nov","Dec","Jan","Feb"].map(m => (
-                <Pill key={m} label={m==="ALL"?"Все":{Nov:"Ноя",Dec:"Дек",Jan:"Янв",Feb:"Фев"}[m]||m} active={month===m} onClick={()=>setMonth(m)} color="#7c3aed"/>
+                <Pill key={m} label={m==="ALL"?"Все":{Nov:"Ноя",Dec:"Дек",Jan:"Янв",Feb:"Фев"}[m]||m} active={month===m} onClick={()=>setMonth(m)} color={BRAND.gold}/>
               ))}
             </div>
           </div>
@@ -2334,10 +2360,10 @@ function App() {
 
           {/* GEO */}
           <div style={{ display:"flex", alignItems:"center", gap:isMobile?4:6 }}>
-            <span style={{ fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>GEO</span>
+            <span style={{ fontSize:9,color:BRAND.textTertiary,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>GEO</span>
             <div style={{ display:"flex",gap:3,flexWrap:"wrap" }}>
               {geos.map(g => (
-                <Pill key={g} label={g==="ALL"?"🌎 Все":`${GEO_FLAGS[g]} ${g}`} active={geo===g} onClick={()=>setGeo(g)} color="#1a56db"/>
+                <Pill key={g} label={g==="ALL"?"🌎 Все":`${GEO_FLAGS[g]} ${g}`} active={geo===g} onClick={()=>setGeo(g)} color={BRAND.blue}/>
               ))}
             </div>
           </div>
@@ -2346,9 +2372,9 @@ function App() {
 
           {/* Product */}
           <div style={{ display:"flex", alignItems:"center", gap:isMobile?4:6 }}>
-            <span style={{ fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>Продукт</span>
+            <span style={{ fontSize:9,color:BRAND.textTertiary,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>Продукт</span>
             <div style={{ display:"flex",gap:3 }}>
-              {[{id:"all",label:"🎯 Все",c:"#0891b2"},{id:"casino",label:"🎰 Casino",c:"#7c3aed"},{id:"sport",label:"⚽ Sport",c:"#22c55e"}].map(p => (
+              {[{id:"all",label:"🎯 Все",c:BRAND.cyan},{id:"casino",label:"🎰 Casino",c:BRAND.purple},{id:"sport",label:"⚽ Sport",c:BRAND.green}].map(p => (
                 <Pill key={p.id} label={p.label} active={product===p.id} onClick={()=>setProduct(p.id)} color={p.c}/>
               ))}
             </div>
@@ -2360,11 +2386,11 @@ function App() {
               <div style={{ width:1,height:24,background:border }}/>
               <div style={{ display:"flex",gap:8 }}>
                 <span style={{ fontSize:10,color:"#22c55e",fontWeight:700 }}>{fmtN(cm.players)} игроков</span>
-                <span style={{ fontSize:10,color:"#94a3b8" }}>·</span>
-                <span style={{ fontSize:10,color:"#1a56db",fontWeight:700 }}>{fmt(cm.sum)} депозиты</span>
-                <span style={{ fontSize:10,color:"#94a3b8" }}>·</span>
+                <span style={{ fontSize:10,color:"#c1cfe0" }}>·</span>
+                <span style={{ fontSize:10,color:"#2563eb",fontWeight:700 }}>{fmt(cm.sum)} депозиты</span>
+                <span style={{ fontSize:10,color:"#c1cfe0" }}>·</span>
                 <span style={{ fontSize:10,color:cm.dec>35?"#dc2626":"#f59e0b",fontWeight:700 }}>Decline {cm.dec}%</span>
-                {pm && <><span style={{ fontSize:10,color:"#94a3b8" }}>·</span>
+                {pm && <><span style={{ fontSize:10,color:"#c1cfe0" }}>·</span>
                   <span style={{ fontSize:10,color:cm.players>pm.players?"#22c55e":"#dc2626",fontWeight:700 }}>
                     {cm.players>pm.players?"▲":"▼"} {Math.abs(((cm.players-pm.players)/pm.players*100)).toFixed(0)}% vs {prevM}
                   </span></>}
@@ -2375,12 +2401,12 @@ function App() {
       </div>
 
       {/* ══ TAB BAR ═════════════════════════════════════════════════ */}
-      <div style={{ display:"flex",gap:2,padding:isMobile?"6px 10px":"8px 18px",background:surface,borderBottom:`1px solid ${border}`,flexShrink:0,overflowX:"auto",WebkitOverflowScrolling:"touch" }}>
+      <div style={{ display:"flex",gap:2,padding:isMobile?"6px 10px":"8px 18px",background:BRAND.surface,borderBottom:`1px solid ${BRAND.border}`,flexShrink:0,overflowX:"auto",WebkitOverflowScrolling:"touch" }}>
         {tabs.map(t => (
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
             padding:isMobile?"5px 10px":"6px 14px",borderRadius:7,border:"none",cursor:"pointer",
-            background:tab===t.id?"#1a56db":"transparent",
-            color:tab===t.id?"#fff":"#64748b",
+            background:tab===t.id?BRAND.blue:"transparent",
+            color:tab===t.id?"#fff":BRAND.textTertiary,
             fontSize:isMobile?10:11,fontWeight:tab===t.id?700:400,transition:"all 0.18s",
             whiteSpace:"nowrap",flexShrink:0
           }}>{t.label}</button>
