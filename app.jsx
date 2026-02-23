@@ -1326,203 +1326,136 @@ const CJM_STAGES = [
 const EMOTION_COLORS = ["#dc2626","#ea580c","#f59e0b","#84cc16","#22c55e"];
 const EMOTION_LABELS = ["Гнев","Фрустрация","Нейтрально","Доволен","Восторг"];
 
-const CJM_SCREENSHOTS = {
-  1: [
-    { id:"s1-app", file:"img/stage3-top.jpg", area:"bottom",
-      label:"Баннер «СКАЧАТЬ» приложение",
-      desc:"Внизу экрана баннер загрузки приложения. При 85.7% мобильного трафика — отсутствие в App Store / Google Play критично.",
-      problems:[
-        {x:50,y:92,text:"Приложения нет в сторах — только APK. Конкуренты Betano, Sportingbet в App Store."}
-      ]},
-    { id:"s1-tg", file:"img/stage3-footer.jpg", area:"social",
-      label:"Telegram — 238 подписчиков",
-      desc:"В футере ссылка на Telegram, Instagram, X. Telegram-канал есть но фактически мёртв (238 подписчиков).",
-      problems:[
-        {x:18,y:72,text:"Telegram канал: 238 подписчиков за весь период при 677K пользователей — упущенный бесплатный retention-канал."}
-      ]},
+const CJM_UI_REVIEW = {
+  1:[
+    {icon:"📵",title:"Нет приложения в App Store / Google Play",type:"critical",
+     where:"Баннер «СКАЧАТЬ» внизу экрана",
+     problem:"85.7% трафика — мобильный. Приложения нет в сторах — только APK через сайт. Конкуренты Betano, Sportingbet присутствуют в сторах.",
+     fix:"Разместить приложение в App Store и Google Play. Иконка на экране телефона ×3 retention vs браузер."},
+    {icon:"💬",title:"Telegram-канал мёртв: 238 подписчиков",type:"warning",
+     where:"Футер сайта — иконки Telegram, Instagram, X",
+     problem:"238 подписчиков за весь период при 677K пользователей. Канал создан, но не развивается — 0 охвата.",
+     fix:"3 поста/неделю: скриншоты выигрышей, эксклюзивные промокоды для подписчиков. Цель: 2–5K подписчиков за 3 мес."},
+    {icon:"🔗",title:"Direct 46% + Referral 43% — 89% зависимость от платного трафика",type:"warning",
+     where:"Структура источников трафика (GA4)",
+     problem:"Органика (SEO) 4.7%, соцсети 0.6%. Почти весь трафик — платный. Нет стратегии бесплатного привлечения.",
+     fix:"SEO: hreflang + лендинги под 'casino online Brasil', 'tragamonedas Argentina'. Срок: 3–6 мес → +15–20% органики."},
   ],
-  2: [
-    { id:"s2-footer", file:"img/stage3-footer.jpg", area:"trust",
-      label:"Футер: trust-элементы",
-      desc:"МЕДИА ПАРТНЁРЫ (Casino Guru, casinoMentor), GamCare, Copyright. Единственные элементы социального доказательства на сайте.",
-      problems:[
-        {x:50,y:38,text:"Медиа-партнёры есть, но нет ленты выигрышей и отзывов игроков — ключевого social proof для LATAM."},
-        {x:50,y:85,text:"GamCare и лицензия — хорошо для доверия, но пользователь видит это только в самом низу страницы."}
-      ]},
+  2:[
+    {icon:"🛡️",title:"Нет social proof — ни ленты выигрышей, ни отзывов",type:"critical",
+     where:"Главная страница — отсутствует полностью",
+     problem:"Новый пользователь приходит с нулевым знанием бренда. Нет ленты 'Игрок из BR выиграл $340'. Нет Trustpilot-виджета.",
+     fix:"Live feed последних 20 крупных выплат — стандарт Stake.com, Roobet, BC.Game. Реализация: 1–2 недели."},
+    {icon:"🔒",title:"/en/block: 13 200 сессий — пользователи блокируются",type:"warning",
+     where:"Страница блокировки (GA4 data)",
+     problem:"Часть блокировок — корректный антифрод, часть — ложные срабатывания. Без breakdown причин — неизвестно сколько потерь.",
+     fix:"Запросить breakdown от команды безопасности. Если >20% ложных — потенциальные FTD."},
+    {icon:"🔑",title:"/passwordforgot: 8 037 сессий",type:"info",
+     where:"Страница восстановления пароля",
+     problem:"Часть пользователей успешно восстанавливает доступ. Вопрос: скорость доставки email и попадание в спам на BR-провайдерах (UOL, Terra).",
+     fix:"Проверить time-to-email и spam rate по GEO. Если проблема: SendGrid/Mailgun для LATAM."},
   ],
-  3: [
-    { id:"s3-hero", file:"img/stage3-top.jpg", area:"promo",
-      label:"Промо-сторис и навигация",
-      desc:"Первый экран: 4 промо-сториса, навигация Спорт/Казино/Live-Казино, ТОП СПОРТЫ, начало СЛОТОВ.",
-      problems:[
-        {x:35,y:18,text:"2 из 4 промо — спортивные акции ('Двойной вызов: футбол', '30% кэшбэк теннис') при Casino = 92% GGR."},
-        {x:50,y:46,text:"ТОП СПОРТЫ: Футбол, Баскетбол, Теннис, Настольный теннис — нет UFC/MMA для BR и MX аудитории."}
-      ]},
-    { id:"s3-content", file:"img/stage3-mid.jpg", area:"content",
-      label:"Контент: события, live-казино, игры",
-      desc:"Прокрутка ниже: ТОП СОБЫТИЯ со ставками, LIVE-КАЗИНО, SB GAMES с категориями игр.",
-      problems:[
-        {x:50,y:55,text:"SB GAMES: категории 'Все игры', 'Для Вас', 'Лучшее' — сортировка не по марже. Fortune Tiger #1 при 1.15% маржи."}
-      ]},
+  3:[
+    {icon:"🎰",title:"2 из 4 промо-сторис — спортивные при Casino = 92% GGR",type:"critical",
+     where:"Верхний блок промо-сторис на первом экране",
+     problem:"'Двойной вызов: футбол и баскетбол', '30% кэшбэк на теннис' — 50% промо-площади под спорт. Casino = 92% GGR gross ($933K).",
+     fix:"Перебалансировать: 3 casino + 1 sport. 1 welcome-бонус casino + 1 топовый слот + 1 Aviator + 1 спорт. CMS — без разработки."},
+    {icon:"🥊",title:"ТОП СПОРТЫ: нет UFC/MMA — пропущен LATAM-интерес",type:"warning",
+     where:"Блок «ТОП СПОРТЫ» — Футбол, Баскетбол, Теннис, Настольный теннис",
+     problem:"Для BR и MX приоритет — UFC/MMA и бокс. Настольный теннис не релевантен для LATAM аудитории.",
+     fix:"Заменить Настольный теннис на UFC/MMA. 5 минут конфигурации. Если есть GEO-сегментация — разный топ для BR и MX."},
+    {icon:"📱",title:"Навигация Спорт/Казино/Live-Казино — без персонализации",type:"info",
+     where:"Кнопки навигации под промо-сторис",
+     problem:"Все пользователи видят одинаковый первый экран. Casino-user видит спортивный промо первым.",
+     fix:"URL-параметры для маршрутизации: aff_link?product=casino → открывает секцию казино первой."},
   ],
-  4: [],
-  5: [],
-  6: [
-    { id:"s6-slots", file:"img/stage3-top.jpg", area:"slots",
-      label:"Слоты: Fortune Tiger в топе",
-      desc:"СЛОТЫ секция: Fortune Tiger на первом месте — самая популярная игра (2 878 игроков) но маржа gross 1.15%.",
-      problems:[
-        {x:22,y:76,text:"Fortune Tiger #1: маржа 1.15% (почти ноль). Energy Coins (14.5%) и Joker's Jewels (17.5%) не в топе лобби."}
-      ]},
-    { id:"s6-categories", file:"img/stage3-mid.jpg", area:"games",
-      label:"Категории игр и провайдеры",
-      desc:"SB GAMES: Все игры, Для Вас, Лучшее, Лотереи, Слоты. Поиск не на первом экране мобильного лобби.",
-      problems:[
-        {x:50,y:40,text:"Строка поиска не видна на первом экране. Через /casino/search — 643 сек сессия (лучший engagement)."},
-        {x:50,y:90,text:"50+ убыточных провайдеров (Barbara Bang –$5.7K, Hacksaw –$4.3K) остаются доступны в лобби."}
-      ]},
+  4:[
+    {icon:"📝",title:"Кнопка «Регистрация» — 1-click и email",type:"ok",
+     where:"Хедер — кнопка «Регистрация» справа",
+     problem:"Phone/social 1-click — лучший путь. Email — стандартная 3-шаговая форма. 75.8% завершают регистрацию.",
+     fix:"Хорошо. Фокус: проверить скорость email-подтверждения для BR-провайдеров."},
+    {icon:"🎁",title:"Условия бонуса не видны до клика «Выбрать»",type:"warning",
+     where:"Экран выбора бонуса при регистрации",
+     problem:"Вагер x35, срок 7 дней — не показаны рядом с кнопкой. Пользователь узнаёт после активации.",
+     fix:"Добавить ℹ️ тултип: вагер x35, срок 7 дней, мин. депозит. Разработка: 1–2 дня. –30% жалоб."},
   ],
-  7: [],
-  8: [],
-  9: [
-    { id:"s9-social", file:"img/stage3-footer.jpg", area:"social",
-      label:"Соцсети в футере",
-      desc:"Telegram, Instagram, X — единственные каналы возврата. Telegram: 238 подписчиков. Нет email-рассылки, нет push.",
-      problems:[
-        {x:18,y:72,text:"Нет CRM-онбординга: после FTD — тишина. Нет email T+2ч, T+24ч, T+48ч."},
-        {x:50,y:72,text:"Instagram и X без стратегии контента. Нет ленты выигрышей, нет промокодов для подписчиков."}
-      ]},
+  5:[
+    {icon:"💳",title:"6 одинаковых PIX-провайдеров без объяснений",type:"critical",
+     where:"Экран выбора метода оплаты (депозит)",
+     problem:"6 кнопок «PIX» без логотипа и отличий. Паралич выбора: пользователь тыкает наугад → decline.",
+     fix:"Оставить 1–2 надёжных PIX с логотипом + бейдж «Рекомендуем» + время '~2 мин'. A/B тест 2 недели."},
+    {icon:"🇲🇽",title:"Мексика: нет OXXO — 33% decline",type:"critical",
+     where:"Список методов оплаты для MX",
+     problem:"OXXO — cash-метод ~40% MX e-commerce. Его отсутствие = каждый 3-й платёж не проходит.",
+     fix:"Подключить OXXO через Conekta/OpenPay. Срок: 2–4 недели. Ожидание: +40–60% MX депозитов."},
+    {icon:"⏳",title:"/onpay/pending: 8K сессий ожидания платежа",type:"warning",
+     where:"Страница ожидания платежа",
+     problem:"Пользователи возвращаются проверить статус. Часть pending в итоге проходит — но UX ожидания не оптимален.",
+     fix:"Добавить прогресс-бар и время ожидания. Запросить у провайдера pending conversion rate."},
   ],
-  10: [],
+  6:[
+    {icon:"🐯",title:"Fortune Tiger #1 — маржа 1.15%",type:"warning",
+     where:"Секция «СЛОТЫ» — первый слот в списке",
+     problem:"Самая популярная игра (2 878 игроков) но маржа gross 1.15%. Net после бонусов — около нуля или минус.",
+     fix:"Не убирать — объём нужен. Но поднять Energy Coins (14.5%) и Joker's Jewels (17.5%) в топ-3 лобби."},
+    {icon:"🔍",title:"Поиск не на первом экране мобильного лобби",type:"warning",
+     where:"Секция «SB GAMES» — поиск требует скролла",
+     problem:"Путь через /casino/search даёт 643 сек сессии (10.7 мин) — лучший engagement. Но поиск не виден сразу.",
+     fix:"Поисковая строка в хедере мобильного лобби. Быстрое UI-изменение с высоким ROI."},
+    {icon:"💸",title:"50+ убыточных провайдеров остаются в лобби",type:"critical",
+     where:"ПРОВАЙДЕРЫ КАЗИНО — список внизу страницы",
+     problem:"Barbara Bang –$5.7K, Hacksaw –$4.3K, Betsoft –$2.7K. Итого –$24K за период. Winfinity и Mancala видны в лобби.",
+     fix:"Отключить топ-3 убыточных: +$12.8K/период. Полный аудит 50+ провайдеров: +$24K/период."},
+  ],
+  7:[
+    {icon:"🎁",title:"Welcome 100%: win rate 9.9% — 90% теряют бонус",type:"critical",
+     where:"Раздел бонусов / MyCasino",
+     problem:"1 055 получили Welcome-бонус, 104 отыграли = 9.9%. Вагер x35 за 7 дней — нереально для большинства.",
+     fix:"Увеличить срок до 21 дня ИЛИ снизить вагер до x25. Win rate 9.9% → 20–25%."},
+    {icon:"📅",title:"Mid-week reload: win rate 3.2%",type:"warning",
+     where:"Еженедельный бонус",
+     problem:"989 получили, 32 отыграли. Хуже чем отсутствие бонуса — игроки теряют 'бонусные' деньги.",
+     fix:"Заменить на Freebet $5–10 без вагера. 100% восприятие vs 3.2%. Стоимость: ~$10K/мес."},
+    {icon:"⚽",title:"Sport cashback: 100% win rate — эталон",type:"ok",
+     where:"Кэшбэк для ставок",
+     problem:"615 кэшбэков, все получили реальные деньги без условий. Лучший D7 и D30.",
+     fix:"Масштабировать на казино: Casino cashback 5% по той же схеме."},
+  ],
+  8:[
+    {icon:"🆔",title:"KYC-сюрприз при первом выводе",type:"critical",
+     where:"Экран вывода средств → неожиданная верификация",
+     problem:"14 200 сессий на /security (109 сек). Пользователь не был предупреждён при регистрации.",
+     fix:"Одна строка при регистрации: 'Для вывода — верификация ~2 мин'. CMS-изменение. –50% жалоб."},
+    {icon:"📊",title:"OK rate: 60.7% → 79.8% — растёт, но до нормы 10 п.п.",type:"warning",
+     where:"Система выводов (Management.io)",
+     problem:"$1.5M отказанных выводов за 4 мес. Норма ~90%. Каждый +1 п.п. ≈ +$37.5K/мес.",
+     fix:"Breakdown denied по причинам. Compliance vs технические — сколько preventable?"},
+  ],
+  9:[
+    {icon:"📧",title:"Нет email/push онбординга после FTD",type:"critical",
+     where:"После первого депозита — полная тишина",
+     problem:"D1 retention 3.75%. После FTD и игры нет email, нет push, нет оффера. Конкуренты: T+2ч оффер.",
+     fix:"3 касания за 48ч: T+2ч результаты + слот. T+24ч прогресс вагера. T+48ч re-dep 30%. D1 → 8–12%."},
+    {icon:"📱",title:"Соцсети без стратегии контента",type:"warning",
+     where:"Футер — Telegram, Instagram, X",
+     problem:"Telegram: 238 подписчиков. Instagram и X без регулярного контента. Нет промокодов, нет ленты выигрышей.",
+     fix:"Автоматизировать D+1/D+3/D+7 CRM-триггеры. Telegram: 3 поста/нед. Реактивация 3% → 10%."},
+    {icon:"📉",title:"DAU: 11K → 4K за 4 мес",type:"critical",
+     where:"GA4 аналитика",
+     problem:"Отток > притока. Без retention-механизмов при сохранении тренда через 6 мес DAU ~2K.",
+     fix:"Комплекс: онбординг + бонусная реформа + CRM. Недельный retention уже растёт (24% → 51%)."},
+  ],
+  10:[
+    {icon:"🏅",title:"VIP-программа невидима: 0.6% знают о ней",type:"warning",
+     where:"Страница /vipcashback — 4 200 сессий из 677K",
+     problem:"'Медный уровень, 0 баллов' — что даёт, как расти. Нет email при достижении уровня, нет бейджа.",
+     fix:"Страница VIP: 5 уровней, привилегии, прогресс-бар. Email при достижении уровня. ×3–5 engagement."},
+    {icon:"👑",title:"12 Вип++ = 36.7% NGR — концентрация риска",type:"critical",
+     where:"Power BI: VIP-сегменты",
+     problem:"Потеря 3 Вип++ = –11% NGR. Нет whale detection, нет персонального менеджера.",
+     fix:"Автотриггер $500+/мес → менеджер. ROI: 1 удержанный VIP++ >> зарплата менеджера."},
+  ],
 };
-
-function ScreenshotCard({ shot, isMobile, onOpen }) {
-  const hasFile = false;
-  const areaColors = {
-    promo:"#e5a940", content:"#2563eb", trust:"#22c55e", slots:"#7c3aed",
-    games:"#06b6d4", social:"#f59e0b", bottom:"#ef4444",
-  };
-  const ac = areaColors[shot.area] || BRAND.blue;
-  return (
-    <div style={{
-      background:BRAND.card, border:`1px solid ${BRAND.border}`, borderRadius:10,
-      overflow:"hidden", cursor:"pointer", transition:"all 0.2s",
-    }} onClick={() => onOpen(shot)}>
-      <div style={{
-        height: isMobile?140:180, background:`linear-gradient(135deg, ${ac}15, ${BRAND.bg})`,
-        display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center",
-        position:"relative", overflow:"hidden",
-        borderBottom:`2px solid ${ac}44`,
-      }}>
-        {shot.file && <img src={shot.file} alt={shot.label} style={{
-          position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"cover", opacity:0.85,
-        }} onError={(e)=>{e.target.style.display="none"}}/>}
-        <div style={{
-          position:"relative", zIndex:1, textAlign:"center", padding:"0 12px",
-          textShadow: "0 1px 8px rgba(0,0,0,0.8)",
-        }}>
-          <div style={{ fontSize:28, marginBottom:4 }}>📱</div>
-          <div style={{ fontSize:10, color:BRAND.textSecondary, fontWeight:600 }}>{shot.label}</div>
-        </div>
-        {shot.problems.map((p,i) => (
-          <div key={i} style={{
-            position:"absolute", left:`${p.x}%`, top:`${p.y}%`, transform:"translate(-50%,-50%)",
-            width:20, height:20, borderRadius:"50%", background:"#ef4444", border:"2px solid #fff",
-            display:"flex", alignItems:"center", justifyContent:"center",
-            fontSize:10, fontWeight:800, color:"#fff", zIndex:2,
-            boxShadow:"0 0 8px #ef444488", cursor:"pointer",
-          }}>{i+1}</div>
-        ))}
-      </div>
-      <div style={{ padding:"10px 12px" }}>
-        <div style={{ fontSize:11, fontWeight:700, color:BRAND.textPrimary, marginBottom:4 }}>{shot.label}</div>
-        <div style={{ fontSize:10, color:BRAND.textSecondary, lineHeight:1.5, marginBottom:6 }}>{shot.desc}</div>
-        {shot.problems.map((p,i) => (
-          <div key={i} style={{
-            display:"flex", gap:6, alignItems:"flex-start", marginBottom:4,
-            padding:"5px 8px", background:"#1a0808", borderRadius:6, border:"1px solid #7f1d1d33",
-          }}>
-            <div style={{
-              width:16, height:16, borderRadius:"50%", background:"#ef4444", flexShrink:0,
-              display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:8, fontWeight:800, color:"#fff",
-            }}>{i+1}</div>
-            <div style={{ fontSize:10, color:"#fca5a5", lineHeight:1.4 }}>{p.text}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ScreenshotModal({ shot, onClose }) {
-  if (!shot) return null;
-  return (
-    <div onClick={onClose} style={{
-      position:"fixed", inset:0, zIndex:9999,
-      background:"rgba(0,0,0,0.88)", display:"flex", alignItems:"center", justifyContent:"center",
-      padding:20, cursor:"pointer",
-    }}>
-      <div onClick={e=>e.stopPropagation()} style={{
-        maxWidth:600, width:"100%", maxHeight:"90vh", overflowY:"auto",
-        background:BRAND.card, borderRadius:14, border:`1px solid ${BRAND.borderLt}`,
-        cursor:"default",
-      }}>
-        <div style={{
-          height:300, background:`linear-gradient(135deg, ${BRAND.blue}10, ${BRAND.bg})`,
-          position:"relative", overflow:"hidden", borderRadius:"14px 14px 0 0",
-        }}>
-          {shot.file && <img src={shot.file} alt={shot.label} style={{
-            position:"absolute", inset:0, width:"100%", height:"100%", objectFit:"contain",
-            background:BRAND.bg,
-          }} onError={(e)=>{e.target.style.display="none"}}/>}
-          <div style={{
-            position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center",
-          }}>
-            <div style={{ textAlign:"center", textShadow:"0 2px 12px rgba(0,0,0,0.9)" }}>
-              <div style={{ fontSize:40 }}>📱</div>
-              <div style={{ fontSize:12, color:BRAND.textSecondary, fontWeight:700, marginTop:4 }}>{shot.label}</div>
-            </div>
-          </div>
-          {shot.problems.map((p,i) => (
-            <div key={i} style={{
-              position:"absolute", left:`${p.x}%`, top:`${p.y}%`, transform:"translate(-50%,-50%)",
-              width:26, height:26, borderRadius:"50%", background:"#ef4444", border:"2px solid #fff",
-              display:"flex", alignItems:"center", justifyContent:"center",
-              fontSize:12, fontWeight:800, color:"#fff", zIndex:2,
-              boxShadow:"0 0 12px #ef444488",
-            }}>{i+1}</div>
-          ))}
-          <button onClick={onClose} style={{
-            position:"absolute", top:10, right:10, width:32, height:32, borderRadius:"50%",
-            background:"rgba(0,0,0,0.6)", border:"1px solid #ffffff33", color:"#fff",
-            fontSize:16, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
-          }}>✕</button>
-        </div>
-        <div style={{ padding:"16px 18px" }}>
-          <div style={{ fontSize:14, fontWeight:800, color:BRAND.textPrimary, marginBottom:6 }}>{shot.label}</div>
-          <div style={{ fontSize:11, color:BRAND.textSecondary, lineHeight:1.6, marginBottom:12 }}>{shot.desc}</div>
-          <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
-            Проблемы на UI
-          </div>
-          {shot.problems.map((p,i) => (
-            <div key={i} style={{
-              display:"flex", gap:8, alignItems:"flex-start", marginBottom:8,
-              padding:"8px 12px", background:"#1a0808", borderRadius:8, border:"1px solid #7f1d1d44",
-            }}>
-              <div style={{
-                width:22, height:22, borderRadius:"50%", background:"#ef4444", flexShrink:0,
-                display:"flex", alignItems:"center", justifyContent:"center",
-                fontSize:10, fontWeight:800, color:"#fff",
-              }}>{i+1}</div>
-              <div style={{ fontSize:11, color:"#fca5a5", lineHeight:1.5, fontWeight:500 }}>{p.text}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── CJM FUNNEL VIEW ──────────────────────────────────────────
 function CJMFunnelView({ month, geo, product, isMobile }) {
@@ -1530,7 +1463,7 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
   const [innerTab, setInnerTab] = useState("steps");
   const [expandedStep, setExpandedStep] = useState(null);
   const [expandedBarrier, setExpandedBarrier] = useState(null);
-  const [modalShot, setModalShot] = useState(null);
+  const [expandedUI, setExpandedUI] = useState(null);
   const [expandedAction, setExpandedAction] = useState(null);
 
   const isAllMonth = month === "ALL";
@@ -2072,30 +2005,58 @@ function CJMFunnelView({ month, geo, product, isMobile }) {
 
           {innerTab === "ui" && (
             <div>
-              <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:10 }}>
-                📱 Скриншоты интерфейса · Нажми — детали и проблемы UI
+              <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px", marginBottom:8 }}>
+                📱 UI-аудит интерфейса · Нажми — детали и рекомендации
               </div>
-              {(CJM_SCREENSHOTS[activeStage] || []).length > 0 ? (
-                <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12 }}>
-                  {(CJM_SCREENSHOTS[activeStage] || []).map(shot => (
-                    <ScreenshotCard key={shot.id} shot={shot} isMobile={isMobile} onOpen={setModalShot}/>
-                  ))}
-                </div>
-              ) : (
-                <div style={{
-                  padding:"40px 20px", textAlign:"center", background:BRAND.card,
-                  borderRadius:10, border:`1px dashed ${BRAND.border}`,
-                }}>
-                  <div style={{ fontSize:32, marginBottom:8 }}>📷</div>
-                  <div style={{ fontSize:12, color:BRAND.textTertiary, fontWeight:600, marginBottom:4 }}>
-                    Скриншоты для этого этапа пока не добавлены
-                  </div>
-                  <div style={{ fontSize:10, color:BRAND.textMuted }}>
-                    Добавьте скриншоты в папку img/ и обновите CJM_SCREENSHOTS
-                  </div>
-                </div>
-              )}
-              {modalShot && <ScreenshotModal shot={modalShot} onClose={()=>setModalShot(null)}/>}
+              <div style={{ display:"flex", flexDirection:"column", gap:6 }}>
+                {(CJM_UI_REVIEW[activeStage] || []).map((item, i) => {
+                  const isEx = expandedUI === i;
+                  const tc = item.type==="critical"?"#fca5a5":item.type==="warning"?"#fcd34d":item.type==="ok"?"#86efac":BRAND.textSecondary;
+                  const bg = item.type==="critical"?"#1e0808":item.type==="warning"?"#1e1808":item.type==="ok"?"#081e0f":BRAND.card;
+                  const bgEx = item.type==="critical"?"#2a0c0c":item.type==="warning"?"#2a2008":item.type==="ok"?"#0c2a14":BRAND.cardAlt;
+                  const bc = item.type==="critical"?"#7f1d1d44":item.type==="warning"?"#78350f44":item.type==="ok"?"#14532d44":BRAND.border;
+                  const badge = item.type==="critical"?"🔴 CRITICAL":item.type==="warning"?"🟡 IMPROVE":item.type==="ok"?"✅ OK":"ℹ️ INFO";
+                  return (
+                    <div key={i}>
+                      <div onClick={()=>setExpandedUI(isEx?null:i)} style={{
+                        display:"flex", gap:10, alignItems:"center", padding:"10px 12px",
+                        borderRadius:isEx?"8px 8px 0 0":8, cursor:"pointer",
+                        background:isEx?bgEx:bg, border:`1px solid ${bc}`,
+                        borderBottom:isEx?"none":undefined, transition:"background 0.15s",
+                      }}>
+                        <div style={{ fontSize:20, flexShrink:0 }}>{item.icon}</div>
+                        <div style={{ flex:1, minWidth:0 }}>
+                          <div style={{ fontSize:12, fontWeight:700, color:tc, lineHeight:1.3 }}>{item.title}</div>
+                          <div style={{ fontSize:9.5, color:BRAND.textMuted, marginTop:2 }}>{item.where}</div>
+                        </div>
+                        <div style={{ display:"flex", alignItems:"center", gap:6, flexShrink:0 }}>
+                          <span style={{ fontSize:7.5, fontWeight:700, padding:"2px 6px", borderRadius:4, background:`${tc}18`, color:tc, border:`1px solid ${tc}33`, whiteSpace:"nowrap" }}>{badge}</span>
+                          <span style={{ fontSize:9, color:BRAND.textMuted, transition:"transform 0.2s", display:"inline-block", transform:isEx?"rotate(180deg)":"none" }}>▼</span>
+                        </div>
+                      </div>
+                      {isEx && (
+                        <div style={{
+                          padding:"12px 14px", background:bgEx,
+                          border:`1px solid ${bc}`, borderTop:`1px solid ${bc}`,
+                          borderRadius:"0 0 8px 8px",
+                        }}>
+                          <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:5 }}>Проблема</div>
+                          <div style={{ fontSize:11, color:BRAND.textSecondary, lineHeight:1.6, marginBottom:10 }}>{item.problem}</div>
+                          <div style={{ fontSize:9, color:BRAND.textMuted, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.5px", marginBottom:5 }}>Что улучшить</div>
+                          <div style={{
+                            display:"flex", gap:8, alignItems:"flex-start",
+                            padding:"8px 10px", background:`${BRAND.green}10`, borderRadius:6,
+                            border:`1px solid ${BRAND.green}22`,
+                          }}>
+                            <span style={{ fontSize:14, flexShrink:0 }}>💡</span>
+                            <span style={{ fontSize:11, color:"#86efac", lineHeight:1.5, fontWeight:500 }}>{item.fix}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
