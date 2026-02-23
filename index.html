@@ -16,7 +16,13 @@
       overflow: hidden;
       background: #080e1c;
       font-family: 'DM Sans', system-ui, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
     }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #1a2640; border-radius: 4px; }
+    button { -webkit-tap-highlight-color: transparent; }
     #loading {
       display: flex;
       flex-direction: column;

@@ -1,5 +1,15 @@
-const { useState, useMemo } = React;
+const { useState, useMemo, useEffect, useCallback } = React;
 const { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Legend, AreaChart, Area } = Recharts;
+
+function useIsMobile(breakpoint = 768) {
+  const [w, setW] = useState(window.innerWidth);
+  useEffect(() => {
+    const h = () => setW(window.innerWidth);
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
+  return w < breakpoint;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // REAL DATA FROM WM + GA4
@@ -172,7 +182,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 // VIEWS
 // ═══════════════════════════════════════════════════════════════
 
-function OverviewView({ month, geo, product }) {
+function OverviewView({ month, geo, product, isMobile }) {
   const isAll = month === "ALL";
   const months = isAll ? MONTHS : [month];
   const prevMonth = !isAll && MONTHS[MONTHS.indexOf(month) - 1];
@@ -225,17 +235,17 @@ function OverviewView({ month, geo, product }) {
   }));
 
   return (
-    <div style={{ padding: "16px 20px", overflowY: "auto", height: "100%" }}>
+    <div style={{ padding: isMobile?"12px":"16px 20px", overflowY: "auto", height: "100%", WebkitOverflowScrolling:"touch" }}>
       {/* KPI row */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-        <StatCard label="Депозиты (OK)" value={fmt(totalDepSum)} sub={`${fmtN(totalDepPlayers)} игроков · avg $${Math.round(avgDep)}`} color="#1a56db" trend={trendDep} />
-        <StatCard label="GGR / Прибыль" value={fmt(totalProfit)} sub={product === "all" ? "Casino 92% + Sport 8%" : product === "casino" ? "Casino only (92%)" : "Sport only (8%)"} color="#7c3aed" />
-        <StatCard label="Decline rate" value={`${avgDecline.toFixed(1)}%`} sub={geo === "MX" ? "⚠️ MX критично" : geo === "CO" ? "🔴 CO катастрофа" : "средний по периоду"} color={avgDecline > 35 ? "#dc2626" : avgDecline > 20 ? "#f59e0b" : "#22c55e"} />
-        <StatCard label="Вывод OK rate" value={`${wdOkPct.toFixed(1)}%`} sub={`${fmt(wdOkSum)} выплачено`} color="#0891b2" />
+      <div style={{ display: "grid", gridTemplateColumns: isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr", gap: isMobile?8:10, marginBottom: 16 }}>
+        <StatCard label="Депозиты (OK)" value={fmt(totalDepSum)} sub={`${fmtN(totalDepPlayers)} игроков · avg $${Math.round(avgDep)}`} color="#1a56db" trend={trendDep} small={isMobile} />
+        <StatCard label="GGR / Прибыль" value={fmt(totalProfit)} sub={product === "all" ? "Casino 92% + Sport 8%" : product === "casino" ? "Casino only (92%)" : "Sport only (8%)"} color="#7c3aed" small={isMobile} />
+        <StatCard label="Decline rate" value={`${avgDecline.toFixed(1)}%`} sub={geo === "MX" ? "⚠️ MX критично" : geo === "CO" ? "🔴 CO катастрофа" : "средний по периоду"} color={avgDecline > 35 ? "#dc2626" : avgDecline > 20 ? "#f59e0b" : "#22c55e"} small={isMobile} />
+        <StatCard label="Вывод OK rate" value={`${wdOkPct.toFixed(1)}%`} sub={`${fmt(wdOkSum)} выплачено`} color="#0891b2" small={isMobile} />
       </div>
 
       {/* Charts row */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile?"1fr":"1fr 1fr", gap: 12, marginBottom: 14 }}>
         {/* Deposits trend */}
         <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
           <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 10 }}>
@@ -320,11 +330,11 @@ function OverviewView({ month, geo, product }) {
       </div>
 
       {/* Retention benchmarks */}
-      <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: "14px 16px" }}>
+      <div style={{ background: "#111827", border: "1px solid #1f2d40", borderRadius: 10, padding: isMobile?"12px":"14px 16px" }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "#94a3b8", marginBottom: 12 }}>
           🔄 Retention vs норма отрасли · 4 мес (4мес, платформа)
         </div>
-        <div style={{ display: "flex", gap: 16 }}>
+        <div style={{ display: "flex", gap: isMobile?10:16 }}>
           {[
             {label:"D1",actual:3.75,norm:30,color:"#dc2626"},
             {label:"D7",actual:0.92,norm:12,color:"#ef4444"},
@@ -354,7 +364,7 @@ function OverviewView({ month, geo, product }) {
   );
 }
 
-function DepositsView({ month, geo, product }) {
+function DepositsView({ month, geo, product, isMobile }) {
   const isAll = month === "ALL";
   const months = isAll ? MONTHS : [month];
 
@@ -389,9 +399,9 @@ function DepositsView({ month, geo, product }) {
   });
 
   return (
-    <div style={{ padding: "16px 20px", overflowY: "auto", height: "100%" }}>
+    <div style={{ padding: isMobile?"12px":"16px 20px", overflowY: "auto", height: "100%", WebkitOverflowScrolling:"touch" }}>
       {/* Top stats */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile?(months.length>2?"1fr":"1fr 1fr"):`repeat(${months.length},1fr)`, gap: isMobile?8:10, marginBottom: 16 }}>
         {months.map(mo => {
           const d = DEP[mo][geo];
           const prev = DEP[MONTHS[MONTHS.indexOf(mo)-1]]?.[geo];
@@ -430,7 +440,7 @@ function DepositsView({ month, geo, product }) {
         })}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 12, marginBottom: 14 }}>
+      <div style={{ display: "grid", gridTemplateColumns: isMobile?"1fr":"1.2fr 1fr", gap: 12, marginBottom: 14 }}>
         {/* Decline by GEO */}
         <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
           <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>📉 Decline rate по GEO ({isAll ? "Фев" : month})</div>
@@ -500,7 +510,7 @@ function DepositsView({ month, geo, product }) {
   );
 }
 
-function SportCasinoView({ month, geo, product }) {
+function SportCasinoView({ month, geo, product, isMobile }) {
   const isAllMonth = month === "ALL";
   const months = isAllMonth ? MONTHS : [month];
   const m = isAllMonth ? "Feb" : month;
@@ -524,9 +534,9 @@ function SportCasinoView({ month, geo, product }) {
   }));
 
   return (
-    <div style={{ padding: "16px 20px", overflowY: "auto", height: "100%" }}>
+    <div style={{ padding: isMobile?"12px":"16px 20px", overflowY: "auto", height: "100%", WebkitOverflowScrolling:"touch" }}>
       {/* Product split overview */}
-      <div style={{ display:"flex", gap:12, marginBottom:16 }}>
+      <div style={{ display:"flex", flexDirection:isMobile?"column":"row", gap:12, marginBottom:16 }}>
         <div style={{ flex:1, background:"#111827", border:"1px solid #7c3aed33", borderRadius:10, padding:"14px 16px", borderLeft:"3px solid #7c3aed" }}>
           <div style={{ fontSize:10, color:"#7c3aed", fontWeight:700, marginBottom:6, textTransform:"uppercase" }}>🎰 Casino GGR</div>
           <div style={{ display:"flex", alignItems:"baseline", gap:8 }}><div style={{ fontSize:24, fontWeight:800, color:"#c4b5fd" }}>{fmt(casinoProfit)}</div>{!isAllMonth && <div style={{ fontSize:10, color:"#4c1d95" }}>~25% общего</div>}</div>
@@ -545,7 +555,7 @@ function SportCasinoView({ month, geo, product }) {
         </div>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginBottom:14 }}>
+      <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12, marginBottom:14 }}>
         {/* Sport by type */}
         {(product === "sport" || product === "all") && (
           <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
@@ -1291,7 +1301,7 @@ const EMOTION_COLORS = ["#dc2626","#ea580c","#f59e0b","#84cc16","#22c55e"];
 const EMOTION_LABELS = ["Гнев","Фрустрация","Нейтрально","Доволен","Восторг"];
 
 // ─── CJM FUNNEL VIEW ──────────────────────────────────────────
-function CJMFunnelView({ month, geo, product }) {
+function CJMFunnelView({ month, geo, product, isMobile }) {
   const [activeStage, setActiveStage] = useState(1);
   const [innerTab, setInnerTab] = useState("steps");
   const [expandedStep, setExpandedStep] = useState(null);
@@ -1497,104 +1507,129 @@ function CJMFunnelView({ month, geo, product }) {
   ];
 
   return (
-    <div style={{ display:"flex", height:"100%", overflow:"hidden", background:"#080e1c" }}>
+    <div style={{ display:"flex", flexDirection:isMobile?"column":"row", height:"100%", overflow:"hidden", background:"#080e1c" }}>
 
-      {/* ══ LEFT: funnel list ═══════════════════════════════════ */}
-      <div style={{ width:200, flexShrink:0, background:"#090f1e", borderRight:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
-        <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid #142030" }}>
-          <div style={{ fontSize:9, color:"#1e3a5f", fontWeight:800, textTransform:"uppercase", letterSpacing:"1px" }}>ВОРОНКА CJM</div>
-          <div style={{ fontSize:8.5, color:"#334155", marginTop:2, display:"flex", gap:4, alignItems:"center", flexWrap:"wrap" }}>
-            <span style={{ color:"#1a56db66" }}>{isAllGeo ? "🌎 Все GEO" : `${GEO_FLAGS[geo]} ${GEO_NAMES[geo]}`}</span>
-            <span style={{ color:"#1e2d40" }}>·</span>
-            <span style={{ color:"#7c3aed55" }}>{isAllMonth ? "Nov–Feb" : m}</span>
+      {/* ══ LEFT: funnel list (sidebar on desktop, horizontal strip on mobile) ═══ */}
+      {isMobile ? (
+        <div style={{ flexShrink:0, background:"#090f1e", borderBottom:"1px solid #142030" }}>
+          <div style={{ display:"flex", overflowX:"auto", WebkitOverflowScrolling:"touch", padding:"8px 10px", gap:6 }}>
+            {funnelUsers.map((s) => {
+              const isActive = activeStage === s.id;
+              return (
+                <div key={s.id} onClick={() => { setActiveStage(s.id); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); }} style={{
+                  padding:"6px 10px", cursor:"pointer", flexShrink:0, borderRadius:8, minWidth:70, textAlign:"center",
+                  background: isActive ? `${s.color}22` : "transparent",
+                  border: `1.5px solid ${isActive ? s.color : "#142030"}`,
+                  transition:"all 0.15s",
+                }}>
+                  <div style={{ fontSize:14 }}>{s.icon}</div>
+                  <div style={{ fontSize:8, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#475569", marginTop:2, whiteSpace:"nowrap" }}>{s.id}. {s.label}</div>
+                  <div style={{ fontSize:7.5, color:isActive?s.color:"#263040", fontWeight:700, marginTop:1 }}>
+                    {s.dynUsers>=1000 ? `${(s.dynUsers/1000).toFixed(s.dynUsers>=100000?0:1)}K` : s.dynUsers}
+                  </div>
+                  {s.isCritical && <div style={{ width:4, height:4, borderRadius:"50%", background:"#dc2626", margin:"2px auto 0", boxShadow:"0 0 5px #dc262680" }}/>}
+                </div>
+              );
+            })}
           </div>
         </div>
+      ) : (
+        <div style={{ width:200, flexShrink:0, background:"#090f1e", borderRight:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+          <div style={{ padding:"10px 14px 8px", borderBottom:"1px solid #142030" }}>
+            <div style={{ fontSize:9, color:"#1e3a5f", fontWeight:800, textTransform:"uppercase", letterSpacing:"1px" }}>ВОРОНКА CJM</div>
+            <div style={{ fontSize:8.5, color:"#334155", marginTop:2, display:"flex", gap:4, alignItems:"center", flexWrap:"wrap" }}>
+              <span style={{ color:"#1a56db66" }}>{isAllGeo ? "🌎 Все GEO" : `${GEO_FLAGS[geo]} ${GEO_NAMES[geo]}`}</span>
+              <span style={{ color:"#1e2d40" }}>·</span>
+              <span style={{ color:"#7c3aed55" }}>{isAllMonth ? "Nov–Feb" : m}</span>
+            </div>
+          </div>
 
-        <div style={{ flex:1, overflowY:"auto" }}>
-          {funnelUsers.map((s, i) => {
-            const prevS = funnelUsers[i - 1];
-            const barW = Math.max(6, (s.dynUsers / maxU) * 100);
-            const conv = prevS ? Math.round((s.dynUsers / prevS.dynUsers) * 100) : null;
-            const isActive = activeStage === s.id;
-            const isBigDrop = prevS && (s.dynUsers / prevS.dynUsers) < 0.35;
-            const isMedDrop = prevS && !isBigDrop && (s.dynUsers / prevS.dynUsers) < 0.70;
-            const convColor = isBigDrop ? "#fca5a5" : isMedDrop ? "#fcd34d" : "#4ade80";
-            const convBg    = isBigDrop ? "#2d0a0a" : isMedDrop ? "#2d1f0a" : "#0a2010";
+          <div style={{ flex:1, overflowY:"auto" }}>
+            {funnelUsers.map((s, i) => {
+              const prevS = funnelUsers[i - 1];
+              const barW = Math.max(6, (s.dynUsers / maxU) * 100);
+              const conv = prevS ? Math.round((s.dynUsers / prevS.dynUsers) * 100) : null;
+              const isActive = activeStage === s.id;
+              const isBigDrop = prevS && (s.dynUsers / prevS.dynUsers) < 0.35;
+              const isMedDrop = prevS && !isBigDrop && (s.dynUsers / prevS.dynUsers) < 0.70;
+              const convColor = isBigDrop ? "#fca5a5" : isMedDrop ? "#fcd34d" : "#4ade80";
+              const convBg    = isBigDrop ? "#2d0a0a" : isMedDrop ? "#2d1f0a" : "#0a2010";
 
-            return (
-              <div key={s.id}>
-                {i > 0 && (
-                  <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:15, gap:4, padding:"0 10px" }}>
-                    <div style={{ flex:1, height:1, background:"#142030" }}/>
-                    <div style={{ fontSize:8, fontWeight:700, padding:"1px 5px", borderRadius:8, background:convBg, color:convColor, border:`1px solid ${isBigDrop?"#7f1d1d":isMedDrop?"#78350f":"#14532d"}` }}>
-                      {conv}%
+              return (
+                <div key={s.id}>
+                  {i > 0 && (
+                    <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:15, gap:4, padding:"0 10px" }}>
+                      <div style={{ flex:1, height:1, background:"#142030" }}/>
+                      <div style={{ fontSize:8, fontWeight:700, padding:"1px 5px", borderRadius:8, background:convBg, color:convColor, border:`1px solid ${isBigDrop?"#7f1d1d":isMedDrop?"#78350f":"#14532d"}` }}>
+                        {conv}%
+                      </div>
+                      <div style={{ flex:1, height:1, background:"#142030" }}/>
                     </div>
-                    <div style={{ flex:1, height:1, background:"#142030" }}/>
-                  </div>
-                )}
-                <div onClick={() => { setActiveStage(s.id); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); }} style={{
-                  padding:"7px 12px", cursor:"pointer",
-                  background: isActive ? `linear-gradient(90deg, ${s.color}18, transparent)` : "transparent",
-                  borderLeft: `3px solid ${isActive ? s.color : "transparent"}`,
-                  transition:"background 0.15s",
-                }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
-                    <span style={{ fontSize:12 }}>{s.icon}</span>
-                    <span style={{ fontSize:9.5, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#475569", flex:1, lineHeight:1.2 }}>{s.id}. {s.label}</span>
-                    {s.isCritical && <div style={{ width:5, height:5, borderRadius:"50%", background:"#dc2626", boxShadow:"0 0 5px #dc262680" }}/>}
-                  </div>
-                  <div style={{ height:5, background:"#0d1626", borderRadius:3, overflow:"hidden" }}>
-                    <div style={{
-                      width:`${barW}%`, height:"100%", borderRadius:3,
-                      background: isActive ? `linear-gradient(90deg,${s.color},${s.color}99)` : `${s.color}44`,
-                      transition:"width 0.4s ease",
-                    }}/>
-                  </div>
-                  <div style={{ display:"flex", justifyContent:"space-between", marginTop:2 }}>
-                    <span style={{ fontSize:8, color:isActive?s.color:"#263040", fontWeight:isActive?700:400 }}>
-                      {s.dynUsers>=1000 ? `${(s.dynUsers/1000).toFixed(s.dynUsers>=100000?0:1)}K` : s.dynUsers}
-                    </span>
-                    <span style={{ fontSize:7.5, color:"#1e2d40" }}>{((s.dynUsers/maxU)*100).toFixed(0)}%</span>
+                  )}
+                  <div onClick={() => { setActiveStage(s.id); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); }} style={{
+                    padding:"7px 12px", cursor:"pointer",
+                    background: isActive ? `linear-gradient(90deg, ${s.color}18, transparent)` : "transparent",
+                    borderLeft: `3px solid ${isActive ? s.color : "transparent"}`,
+                    transition:"background 0.15s",
+                  }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                      <span style={{ fontSize:12 }}>{s.icon}</span>
+                      <span style={{ fontSize:9.5, fontWeight:isActive?700:400, color:isActive?"#e2e8f0":"#475569", flex:1, lineHeight:1.2 }}>{s.id}. {s.label}</span>
+                      {s.isCritical && <div style={{ width:5, height:5, borderRadius:"50%", background:"#dc2626", boxShadow:"0 0 5px #dc262680" }}/>}
+                    </div>
+                    <div style={{ height:5, background:"#0d1626", borderRadius:3, overflow:"hidden" }}>
+                      <div style={{
+                        width:`${barW}%`, height:"100%", borderRadius:3,
+                        background: isActive ? `linear-gradient(90deg,${s.color},${s.color}99)` : `${s.color}44`,
+                        transition:"width 0.4s ease",
+                      }}/>
+                    </div>
+                    <div style={{ display:"flex", justifyContent:"space-between", marginTop:2 }}>
+                      <span style={{ fontSize:8, color:isActive?s.color:"#263040", fontWeight:isActive?700:400 }}>
+                        {s.dynUsers>=1000 ? `${(s.dynUsers/1000).toFixed(s.dynUsers>=100000?0:1)}K` : s.dynUsers}
+                      </span>
+                      <span style={{ fontSize:7.5, color:"#1e2d40" }}>{((s.dynUsers/maxU)*100).toFixed(0)}%</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        <div style={{ padding:"8px 12px", borderTop:"1px solid #142030", background:"#060c18" }}>
-          {[
-            {l:"Трафик → FTD", v:((funnelUsers[5]?.dynUsers/maxU)*100).toFixed(1)+"%", c:"#f87171"},
-            {l:"FTD → Return", v:((funnelUsers[9]?.dynUsers/(funnelUsers[5]?.dynUsers||1))*100).toFixed(0)+"%", c:"#f87171"},
-            {l:"Потенциал",    v:"+$430K/мес", c:"#4ade80"},
-          ].map(r => (
-            <div key={r.l} style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
-              <span style={{ fontSize:8, color:"#1e2d40" }}>{r.l}</span>
-              <span style={{ fontSize:8, fontWeight:700, color:r.c }}>{r.v}</span>
-            </div>
-          ))}
+          <div style={{ padding:"8px 12px", borderTop:"1px solid #142030", background:"#060c18" }}>
+            {[
+              {l:"Трафик → FTD", v:((funnelUsers[5]?.dynUsers/maxU)*100).toFixed(1)+"%", c:"#f87171"},
+              {l:"FTD → Return", v:((funnelUsers[9]?.dynUsers/(funnelUsers[5]?.dynUsers||1))*100).toFixed(0)+"%", c:"#f87171"},
+              {l:"Потенциал",    v:"+$430K/мес", c:"#4ade80"},
+            ].map(r => (
+              <div key={r.l} style={{ display:"flex", justifyContent:"space-between", marginBottom:3 }}>
+                <span style={{ fontSize:8, color:"#1e2d40" }}>{r.l}</span>
+                <span style={{ fontSize:8, fontWeight:700, color:r.c }}>{r.v}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ══ MAIN PANEL ════════════════════════════════════════════ */}
       <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", minWidth:0 }}>
 
         {/* Stage hero */}
         <div style={{
-          padding:"14px 20px 12px",
+          padding:isMobile?"10px 12px":"14px 20px 12px",
           background:`linear-gradient(160deg, ${stage?.colorLight||"#0d1526"} 0%, #080e1c 100%)`,
           borderBottom:"1px solid #142030", flexShrink:0,
         }}>
-          <div style={{ display:"flex", gap:12, alignItems:"flex-start", marginBottom:10 }}>
+          <div style={{ display:"flex", gap:isMobile?8:12, alignItems:"flex-start", marginBottom:isMobile?6:10, flexWrap:isMobile?"wrap":"nowrap" }}>
             <div style={{
-              width:48, height:48, borderRadius:14, flexShrink:0,
+              width:isMobile?36:48, height:isMobile?36:48, borderRadius:isMobile?10:14, flexShrink:0,
               background:`${stage?.color}18`, border:`2px solid ${stage?.color}44`,
-              display:"flex", alignItems:"center", justifyContent:"center", fontSize:22,
+              display:"flex", alignItems:"center", justifyContent:"center", fontSize:isMobile?18:22,
             }}>{stage?.icon}</div>
 
-            <div style={{ flex:1 }}>
-              <div style={{ display:"flex", alignItems:"center", gap:7, flexWrap:"wrap", marginBottom:3 }}>
-                <span style={{ fontSize:15, fontWeight:800, color:"#f1f5f9", letterSpacing:"-0.3px" }}>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:isMobile?5:7, flexWrap:"wrap", marginBottom:3 }}>
+                <span style={{ fontSize:isMobile?13:15, fontWeight:800, color:"#f1f5f9", letterSpacing:"-0.3px" }}>
                   {stage?.id}. {stage?.label}
                 </span>
                 {stage?.isCritical && <span style={{ fontSize:8, fontWeight:700, padding:"2px 6px", borderRadius:8, background:"#2d0a0a", color:"#fca5a5", border:"1px solid #7f1d1d" }}>🔴 CRITICAL</span>}
@@ -1612,19 +1647,21 @@ function CJMFunnelView({ month, geo, product }) {
               </div>
               <div style={{ fontSize:10, color:`${stage?.color}bb`, marginBottom:7 }}>{stage?.sublabel}</div>
               {/* Emotion bar */}
-              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-                {[1,2,3,4,5].map(i => (
-                  <div key={i} style={{
-                    width: i === stage?.emotion ? 28 : 18, height:7, borderRadius:2,
-                    background: i <= (stage?.emotion||0) ? EMOTION_COLORS[(stage?.emotion||1)-1] : "#0d1626",
-                    opacity: i <= (stage?.emotion||0) ? (i===stage?.emotion?1:0.5) : 0.2,
-                    transition:"all 0.3s",
-                  }}/>
-                ))}
-                <span style={{ fontSize:10, fontWeight:700, color:stage?EMOTION_COLORS[stage.emotion-1]:"#64748b" }}>
+              <div style={{ display:"flex", alignItems:"center", gap:isMobile?5:8, flexWrap:isMobile?"wrap":"nowrap" }}>
+                <div style={{ display:"flex", gap:isMobile?3:0, alignItems:"center" }}>
+                  {[1,2,3,4,5].map(i => (
+                    <div key={i} style={{
+                      width: i === stage?.emotion ? (isMobile?20:28) : (isMobile?12:18), height:isMobile?5:7, borderRadius:2,
+                      background: i <= (stage?.emotion||0) ? EMOTION_COLORS[(stage?.emotion||1)-1] : "#0d1626",
+                      opacity: i <= (stage?.emotion||0) ? (i===stage?.emotion?1:0.5) : 0.2,
+                      transition:"all 0.3s",
+                    }}/>
+                  ))}
+                </div>
+                <span style={{ fontSize:isMobile?9:10, fontWeight:700, color:stage?EMOTION_COLORS[stage.emotion-1]:"#64748b" }}>
                   {stage?EMOTION_LABELS[stage.emotion-1]:""}
                 </span>
-                <span style={{ fontSize:9, color:"#2d3f55" }}>— {stage?.emotionText}</span>
+                {!isMobile && <span style={{ fontSize:9, color:"#2d3f55" }}>— {stage?.emotionText}</span>}
               </div>
             </div>
 
@@ -1651,7 +1688,7 @@ function CJMFunnelView({ month, geo, product }) {
           </div>
 
           {/* KPI strip */}
-          <div style={{ display:"flex", gap:7 }}>
+          <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 1fr", gap:isMobile?5:7 }}>
             {stage?.kpi?.map((k, i) => {
               const srcColors = { "MIO":["#b45309","#3d1a00"], "PBI":["#1a56db","#0c1e4a"], "GA4":["#059669","#0a2e1f"], "WM":["#7c3aed","#2d1b69"] };
               const sc = k.src ? srcColors[k.src] || ["#475569","#1e2535"] : null;
@@ -1674,29 +1711,31 @@ function CJMFunnelView({ month, geo, product }) {
         </div>
 
         {/* Inner tabs */}
-        <div style={{ display:"flex", alignItems:"center", padding:"6px 20px", borderBottom:"1px solid #142030", background:"#090f1e", flexShrink:0, gap:2 }}>
+        <div style={{ display:"flex", alignItems:"center", padding:isMobile?"5px 10px":"6px 20px", borderBottom:"1px solid #142030", background:"#090f1e", flexShrink:0, gap:2, overflowX:"auto", WebkitOverflowScrolling:"touch" }}>
           {innerTabs.map(t => (
             <button key={t.id} onClick={() => setInnerTab(t.id)} style={{
-              padding:"5px 11px", borderRadius:6, border:"none", cursor:"pointer",
+              padding:isMobile?"4px 8px":"5px 11px", borderRadius:6, border:"none", cursor:"pointer",
               background:innerTab===t.id?"#1a56db":"transparent",
               color:innerTab===t.id?"#fff":"#2d3f55",
-              fontSize:10.5, fontWeight:innerTab===t.id?700:400, transition:"all 0.15s",
-              display:"flex", alignItems:"center", gap:3,
+              fontSize:isMobile?9.5:10.5, fontWeight:innerTab===t.id?700:400, transition:"all 0.15s",
+              display:"flex", alignItems:"center", gap:3, whiteSpace:"nowrap", flexShrink:0,
             }}>{t.icon} {t.label}</button>
           ))}
           <div style={{ flex:1 }}/>
-          <button onClick={() => { if(activeStage>1){ setActiveStage(s=>s-1); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); } }} disabled={activeStage===1} style={{
-            padding:"4px 9px", borderRadius:5, border:"1px solid #142030", background:"transparent",
-            color:activeStage===1?"#142030":"#2d3f55", cursor:activeStage===1?"default":"pointer", fontSize:10,
-          }}>← {CJM_STAGES.find(s=>s.id===activeStage-1)?.label||""}</button>
-          <button onClick={() => { if(activeStage<10){ setActiveStage(s=>s+1); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); } }} disabled={activeStage===10} style={{
-            padding:"4px 9px", borderRadius:5, border:"1px solid #142030", background:"transparent",
-            color:activeStage===10?"#142030":"#2d3f55", cursor:activeStage===10?"default":"pointer", fontSize:10,
-          }}>{CJM_STAGES.find(s=>s.id===activeStage+1)?.label||""} →</button>
+          {!isMobile && <>
+            <button onClick={() => { if(activeStage>1){ setActiveStage(s=>s-1); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); } }} disabled={activeStage===1} style={{
+              padding:"4px 9px", borderRadius:5, border:"1px solid #142030", background:"transparent",
+              color:activeStage===1?"#142030":"#2d3f55", cursor:activeStage===1?"default":"pointer", fontSize:10,
+            }}>← {CJM_STAGES.find(s=>s.id===activeStage-1)?.label||""}</button>
+            <button onClick={() => { if(activeStage<10){ setActiveStage(s=>s+1); setExpandedStep(null); setExpandedBarrier(null); setExpandedAction(null); } }} disabled={activeStage===10} style={{
+              padding:"4px 9px", borderRadius:5, border:"1px solid #142030", background:"transparent",
+              color:activeStage===10?"#142030":"#2d3f55", cursor:activeStage===10?"default":"pointer", fontSize:10,
+            }}>{CJM_STAGES.find(s=>s.id===activeStage+1)?.label||""} →</button>
+          </>}
         </div>
 
         {/* Content */}
-        <div style={{ flex:1, overflowY:"auto", padding:"14px 20px" }}>
+        <div style={{ flex:1, overflowY:"auto", padding:isMobile?"10px 12px":"14px 20px", WebkitOverflowScrolling:"touch" }}>
 
           {innerTab === "steps" && (
             <div>
@@ -2030,7 +2069,7 @@ function CJMFunnelView({ month, geo, product }) {
       </div>
 
       {/* ══ RIGHT: Sankey + quick stats ══════════════════════════ */}
-      <div style={{ width:190, flexShrink:0, background:"#090f1e", borderLeft:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      {!isMobile && <div style={{ width:190, flexShrink:0, background:"#090f1e", borderLeft:"1px solid #142030", display:"flex", flexDirection:"column", overflow:"hidden" }}>
         <div style={{ padding:"8px 12px 6px", borderBottom:"1px solid #142030" }}>
           <div style={{ fontSize:8.5, color:"#1e2d40", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.8px" }}>Поток</div>
         </div>
@@ -2088,12 +2127,12 @@ function CJMFunnelView({ month, geo, product }) {
             );
           })}
         </div>
-      </div>
+      </div>}
     </div>
   );
 }
 
-function GeoView({ month, geo, product }) {
+function GeoView({ month, geo, product, isMobile }) {
   const isAllMonth = month === "ALL";
   const m = isAllMonth ? "Feb" : month;
   const prevM = MONTHS[MONTHS.indexOf(m) - 1] || null;
@@ -2126,8 +2165,8 @@ function GeoView({ month, geo, product }) {
   });
 
   return (
-    <div style={{ padding:"16px 20px", overflowY:"auto", height:"100%" }}>
-      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:14 }}>
+    <div style={{ padding:isMobile?"12px":"16px 20px", overflowY:"auto", height:"100%", WebkitOverflowScrolling:"touch" }}>
+      <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(3,1fr)", gap:10, marginBottom:14 }}>
         {radarData.map(d => (
           <div key={d.g} style={{
             background:"#111827",
@@ -2167,7 +2206,7 @@ function GeoView({ month, geo, product }) {
       </div>
 
       {/* GEO comparison charts */}
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12 }}>
         <div style={{ background:"#111827", border:"1px solid #1f2d40", borderRadius:10, padding:"14px 16px" }}>
           <div style={{ fontSize:11, fontWeight:700, color:"#94a3b8", marginBottom:10 }}>🏦 Avg депозит по GEO (динамика){!isAllMonth ? ` · отмечен ${m}` : ""}</div>
           <ResponsiveContainer width="100%" height={160}>
@@ -2219,6 +2258,7 @@ function App() {
   const [geo, setGeo] = useState("ALL");
   const [product, setProduct] = useState("all");
   const [tab, setTab] = useState("overview");
+  const isMobile = useIsMobile();
 
   const bg = "#080e1c";
   const surface = "#0d1526";
@@ -2242,15 +2282,15 @@ function App() {
     <div style={{ fontFamily:"'DM Sans',system-ui,sans-serif", background:bg, color:"#e2e8f0", height:"100vh", display:"flex", flexDirection:"column", overflow:"hidden" }}>
 
       {/* ══ HEADER ══════════════════════════════════════════════════ */}
-      <div style={{ background:surface, borderBottom:`1px solid ${border}`, padding:"10px 18px", flexShrink:0 }}>
+      <div style={{ background:surface, borderBottom:`1px solid ${border}`, padding:isMobile?"8px 10px":"10px 18px", flexShrink:0 }}>
         {/* Row 1: Logo + title + NSM badges */}
-        <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:10 }}>
-          <div style={{ width:34,height:34,borderRadius:8,background:"linear-gradient(135deg,#1a56db,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0 }}>💎</div>
-          <div>
-            <div style={{ fontSize:13,fontWeight:800,color:"#fff",letterSpacing:"-0.3px" }}>SapphireBet · CJM Analytics</div>
-            <div style={{ fontSize:9,color:"#64748b" }}>Nov 2025 – Feb 2026 · LATAM · White Label 1xBet · Источники: MIO = Management.io · PBI = Power BI · GA4 = Google Analytics</div>
+        <div style={{ display:"flex", alignItems:"center", gap:isMobile?8:12, marginBottom:isMobile?6:10, flexWrap:isMobile?"wrap":"nowrap" }}>
+          <div style={{ width:isMobile?28:34,height:isMobile?28:34,borderRadius:8,background:"linear-gradient(135deg,#1a56db,#7c3aed)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:isMobile?13:16,flexShrink:0 }}>💎</div>
+          <div style={{ minWidth:0 }}>
+            <div style={{ fontSize:isMobile?11:13,fontWeight:800,color:"#fff",letterSpacing:"-0.3px" }}>SapphireBet · CJM Analytics</div>
+            {!isMobile && <div style={{ fontSize:9,color:"#64748b" }}>Nov 2025 – Feb 2026 · LATAM · White Label 1xBet · Источники: MIO = Management.io · PBI = Power BI · GA4 = Google Analytics</div>}
           </div>
-          <div style={{ marginLeft:"auto",display:"flex",gap:8,alignItems:"center" }}>
+          {!isMobile && <div style={{ marginLeft:"auto",display:"flex",gap:8,alignItems:"center" }}>
             {[
               {l:"Total GGR gross (MIO)",v:"$1.07M",c:"#7c3aed"},
               {l:"Casino GGR gross (MIO)",v:"$933K",c:"#a855f7"},
@@ -2264,13 +2304,24 @@ function App() {
                 <div style={{ fontSize:8,color:"#64748b" }}>{m.l}</div>
               </div>
             ))}
-          </div>
+          </div>}
+          {isMobile && <div style={{ marginLeft:"auto",display:"flex",gap:4,flexWrap:"wrap",justifyContent:"flex-end" }}>
+            {[
+              {v:"$1.07M",c:"#7c3aed"},
+              {v:"$3.67M",c:"#1a56db"},
+              {v:"3.75%",c:"#dc2626"},
+            ].map((m,i) => (
+              <div key={i} style={{ background:"#111827",border:`1px solid ${m.c}33`,borderRadius:4,padding:"2px 6px",textAlign:"center" }}>
+                <div style={{ fontSize:9,fontWeight:800,color:m.c }}>{m.v}</div>
+              </div>
+            ))}
+          </div>}
         </div>
 
         {/* Row 2: Filters */}
-        <div style={{ display:"flex", gap:16, alignItems:"center", flexWrap:"wrap" }}>
+        <div style={{ display:"flex", gap:isMobile?8:16, alignItems:"center", flexWrap:"wrap" }}>
           {/* Month */}
-          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:isMobile?4:6 }}>
             <span style={{ fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>Период</span>
             <div style={{ display:"flex",gap:3 }}>
               {["ALL","Nov","Dec","Jan","Feb"].map(m => (
@@ -2279,10 +2330,10 @@ function App() {
             </div>
           </div>
 
-          <div style={{ width:1,height:24,background:border }}/>
+          {!isMobile && <div style={{ width:1,height:24,background:border }}/>}
 
           {/* GEO */}
-          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:isMobile?4:6 }}>
             <span style={{ fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>GEO</span>
             <div style={{ display:"flex",gap:3,flexWrap:"wrap" }}>
               {geos.map(g => (
@@ -2291,10 +2342,10 @@ function App() {
             </div>
           </div>
 
-          <div style={{ width:1,height:24,background:border }}/>
+          {!isMobile && <div style={{ width:1,height:24,background:border }}/>}
 
           {/* Product */}
-          <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:isMobile?4:6 }}>
             <span style={{ fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px" }}>Продукт</span>
             <div style={{ display:"flex",gap:3 }}>
               {[{id:"all",label:"🎯 Все",c:"#0891b2"},{id:"casino",label:"🎰 Casino",c:"#7c3aed"},{id:"sport",label:"⚽ Sport",c:"#22c55e"}].map(p => (
@@ -2304,7 +2355,7 @@ function App() {
           </div>
 
           {/* Active context display */}
-          {cm && (
+          {cm && !isMobile && (
             <>
               <div style={{ width:1,height:24,background:border }}/>
               <div style={{ display:"flex",gap:8 }}>
@@ -2324,24 +2375,25 @@ function App() {
       </div>
 
       {/* ══ TAB BAR ═════════════════════════════════════════════════ */}
-      <div style={{ display:"flex",gap:2,padding:"8px 18px",background:surface,borderBottom:`1px solid ${border}`,flexShrink:0 }}>
+      <div style={{ display:"flex",gap:2,padding:isMobile?"6px 10px":"8px 18px",background:surface,borderBottom:`1px solid ${border}`,flexShrink:0,overflowX:"auto",WebkitOverflowScrolling:"touch" }}>
         {tabs.map(t => (
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            padding:"6px 14px",borderRadius:7,border:"none",cursor:"pointer",
+            padding:isMobile?"5px 10px":"6px 14px",borderRadius:7,border:"none",cursor:"pointer",
             background:tab===t.id?"#1a56db":"transparent",
             color:tab===t.id?"#fff":"#64748b",
-            fontSize:11,fontWeight:tab===t.id?700:400,transition:"all 0.18s"
+            fontSize:isMobile?10:11,fontWeight:tab===t.id?700:400,transition:"all 0.18s",
+            whiteSpace:"nowrap",flexShrink:0
           }}>{t.label}</button>
         ))}
       </div>
 
       {/* ══ CONTENT ════════════════════════════════════════════════ */}
       <div style={{ flex:1,overflow:"hidden",minHeight:0 }}>
-        {tab === "overview" && <OverviewView month={month} geo={geo} product={product}/>}
-        {tab === "deposits" && <DepositsView month={month} geo={geo} product={product}/>}
-        {tab === "product" && <SportCasinoView month={month} geo={geo} product={product}/>}
-        {tab === "geo" && <GeoView month={month} geo={geo} product={product}/>}
-        {tab === "cjm" && <CJMFunnelView month={month} geo={geo} product={product}/>}
+        {tab === "overview" && <OverviewView month={month} geo={geo} product={product} isMobile={isMobile}/>}
+        {tab === "deposits" && <DepositsView month={month} geo={geo} product={product} isMobile={isMobile}/>}
+        {tab === "product" && <SportCasinoView month={month} geo={geo} product={product} isMobile={isMobile}/>}
+        {tab === "geo" && <GeoView month={month} geo={geo} product={product} isMobile={isMobile}/>}
+        {tab === "cjm" && <CJMFunnelView month={month} geo={geo} product={product} isMobile={isMobile}/>}
       </div>
     </div>
   );
